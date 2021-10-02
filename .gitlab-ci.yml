@@ -1,0 +1,62 @@
+image: docker:stable
+services:
+  - docker:dind
+
+stages:
+  - build
+  - stage
+  - prod
+
+variables:
+  STACK_NAME: epicsoft_caveworld
+  STACK_STAGE_NAME: epicsoft_caveworld_stage
+  CONTAINER_FRONTEND_STAGE_IMAGE: es-castle:5000/epicsoft_caveworld/frontend:stage
+  CONTAINER_FRONTEND_PROD_IMAGE: es-castle:5000/epicsoft_caveworld/frontend:latest
+
+build:node_module:
+  image: node:latest
+  stage: build
+  script:
+    - cd CWFrontend && npm install
+  cache:
+    key: node-module-cache
+    paths:
+      - CWFrontend/node_modules/
+
+build:frontend:
+  stage: build
+  cache:
+    key: node-module-cache
+    paths:
+      - CWFrontend/node_modules/
+  script:
+    - docker build --pull -t $CONTAINER_FRONTEND_STAGE_IMAGE -f CWFrontend/docker/stage.Dockerfile ./CWFrontend
+    - docker push $CONTAINER_FRONTEND_STAGE_IMAGE
+
+stage:deploy:
+  stage: stage
+  allow_failure: true
+  script:
+    - docker stack deploy --compose-file docker-compose-stage.yml $STACK_STAGE_NAME
+    - docker service update --force ${STACK_STAGE_NAME}_frontend
+
+prod:build:frontend:
+  stage: prod
+  when: manual
+  cache:
+    key: node-module-cache
+    paths:
+      - CWFrontend/node_modules/
+  script:
+    - docker build --pull -t $CONTAINER_FRONTEND_PROD_IMAGE -f CWFrontend/docker/prod.Dockerfile ./CWFrontend
+    - docker push $CONTAINER_FRONTEND_PROD_IMAGE
+  only:
+    - master
+
+prod:deploy:
+  stage: prod
+  when: manual
+  script:
+    - docker stack deploy --compose-file docker-compose-prod.yml $STACK_NAME
+  only:
+    - master

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: es-castle:5000/epicsoft_caveworld/frontend:stage
+    build:
+      context: ./CWFrontend
+      dockerfile: docker/stage.Dockerfile
+    ports:
+      - 8055:80
+    restart: always
+    deploy:
+        resources:
+            limits:
+                cpus: '0.25'
+                memory: 256M
+        placement:
+            constraints: [node.role == worker, node.labels.arc == x64]

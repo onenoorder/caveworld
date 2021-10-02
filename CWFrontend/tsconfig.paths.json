@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./",
+		"paths": {
+			"*": ["./src/*"],
+      "_utilities/*": ["./src/utilities/*"],
+      "_services/*": ["./src/services/*"],
+      "_entities/*": ["./src/entities/*"],
+      "_buildings/*": ["./src/entities/buildings/*"],
+      "_houses/*": ["./src/entities/buildings/houses/*"],
+      "_storages/*": ["./src/entities/buildings/storages/*"],
+      "_dwarfs/*": ["./src/entities/dwarfs/*"],
+      "_jobs/*": ["./src/jobs/*"],
+      "_tasks/*": ["./src/tasks/*"],
+      "_factories/*": ["./src/factories/*"],
+      "_behaviors/*": ["./src/behaviors/*"],
+      "_goals/*": ["./src/goals/*"]
+		}
+	}
+}
