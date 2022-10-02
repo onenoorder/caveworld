@@ -1,9 +1,10 @@
 import { BufferGeometry, Material, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from 'three';
-import { IHouse } from '_entities/buildings/houses/index';
+import { IHouse } from '_buildings/houses/index';
 import { TextureService } from '_services/index';
 import { IDwarf } from '.';
 import { IGoal, LifeGoal } from '_goals/index';
 import { IJob } from '_jobs/index';
+import { DwarfKind } from '_utilities/Enums';
 
 class Dwarf implements IDwarf {
 	position: Vector3;
@@ -16,12 +17,12 @@ class Dwarf implements IDwarf {
   speed: Vector3;
 	maxSpeed: Vector3;
 	direction: Vector3;
-	kind: string;
+	kind: DwarfKind;
   rotation: number;
   goal: IGoal;
 	job: IJob | null;
 
-	constructor(position: Vector3, home: IHouse | null, kind: string) {
+	constructor(position: Vector3, home: IHouse | null, kind: DwarfKind) {
     this.position = position;
     this.position.z = 0.00001;
     this.height = 1;

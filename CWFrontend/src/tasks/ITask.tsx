@@ -5,4 +5,5 @@ export interface ITask {
   Work(dwarf: IDwarf): IGoal;
   IsCompleted(): boolean;
   IsActivate(): boolean;
+  Destroy(): void;
 }

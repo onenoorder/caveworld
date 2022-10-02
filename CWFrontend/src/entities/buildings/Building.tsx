@@ -12,6 +12,7 @@ abstract class Building implements IBuilding {
   door: number;
   state: number = 0;
   buildProgress: number = 0;
+  buildTotal: number;
 
   constructor(name: string, position: THREE.Vector3, height: number, width: number, door: number) {
     this.position = position;
@@ -19,6 +20,7 @@ abstract class Building implements IBuilding {
     this.width = width;
     this.name = name;
     this.door = door;
+    this.buildTotal = height * width * 10;
     this.object = new THREE.Mesh();
   }
 
@@ -51,16 +53,16 @@ abstract class Building implements IBuilding {
   Build(delta: number) {
     this.buildProgress += delta;
 
-    if (this.state < 1 && this.buildProgress >= 25) {
+    if (this.state < 1 && this.buildProgress >= this.buildTotal * 0.25) {
       this.state = 1;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
-    } else if (this.state < 2 && this.buildProgress >= 50) {
+    } else if (this.state < 2 && this.buildProgress >= this.buildTotal * 0.50) {
       this.state = 2;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
-    } else if (this.state < 3 && this.buildProgress >= 75) {
+    } else if (this.state < 3 && this.buildProgress >= this.buildTotal * 0.75) {
       this.state = 3;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
-    } else if (this.state < 4 && this.buildProgress >= 100) {
+    } else if (this.state < 4 && this.buildProgress >= this.buildTotal) {
       this.state = 4;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
     }

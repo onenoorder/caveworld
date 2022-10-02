@@ -8,5 +8,6 @@ export * from './IdleGoal';
 export * from './DigGoal';
 export * from './CraftStairGoal';
 export * from './FollowPathGoal';
+export * from './ConstructScaffoldingGoal';
 export * from './ConstructScaffoldGoal';
 export * from './ConstructBuildingGoal';

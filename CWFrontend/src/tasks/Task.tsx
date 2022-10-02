@@ -19,4 +19,8 @@ export abstract class Task implements ITask {
     this.goal = this.CreateGoal(dwarf);
     return this.goal;
   }
+
+  Destroy(): void {
+    
+  }
 }

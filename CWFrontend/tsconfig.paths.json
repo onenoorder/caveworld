@@ -10,6 +10,7 @@
       "_houses/*": ["./src/entities/buildings/houses/*"],
       "_storages/*": ["./src/entities/buildings/storages/*"],
       "_dwarfs/*": ["./src/entities/dwarfs/*"],
+      "_constructions/*": ["./src/entities/constructions/*"],
       "_jobs/*": ["./src/jobs/*"],
       "_tasks/*": ["./src/tasks/*"],
       "_factories/*": ["./src/factories/*"],

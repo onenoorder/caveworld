@@ -26,9 +26,9 @@ class GameComponent extends Component {
       <div style={{width:"80%", height:"calc(100% - 40px)", position:"absolute"}} 
         ref={thisNode => this.container=thisNode}
       />
-      <div style={{width:"20%", height:"12px", position:"absolute", right:0, bottom:"40px"}}>
-        <img style={{width:"12px", height:"12px", float:"left", objectFit:"scale-down"}} alt="Dig" src={"textures/Dig.png"} onClick={() => PlacementService.Instance.PlaceJob(1)} />
-        <img style={{width:"12px", height:"12px", float:"left", objectFit:"scale-down"}} alt="Stair" src={"textures/Stair.png"} onClick={() => PlacementService.Instance.PlaceJob(2)} />
+      <div style={{width:"20%", height:"32px", position:"absolute", right:0, bottom:"40px"}}>
+        <img style={{width:"32px", height:"32px", float:"left", objectFit:"scale-down"}} alt="Dig" src={"textures/Dig.png"} onClick={() => PlacementService.Instance.PlaceJob(1)} />
+        <img style={{width:"32px", height:"32px", float:"left", objectFit:"scale-down"}} alt="Stair" src={"textures/Stair.png"} onClick={() => PlacementService.Instance.PlaceJob(2)} />
       </div>
       <div style={{width:"100%", height:"40px", position:"absolute", bottom:0}}>
         <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="TinyHouse" src={"textures/buildings/TinyHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(1)} />

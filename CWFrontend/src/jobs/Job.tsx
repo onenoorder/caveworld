@@ -28,6 +28,9 @@ abstract class Job implements IJob {
   }
   
   Destroy(): void {
+    while(this.tasks.Size() > 0) {
+      this.tasks.Pop();
+    }
   }
 
   IsFull(): boolean {

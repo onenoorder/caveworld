@@ -47,7 +47,7 @@ class PlacementService {
   BuildTempJobPath(position: Vector3, jobId: number) {
     this.DestroyTempJobPlacements();
 
-    if (jobId == 1) {
+    if (jobId === 1) {
       if (this.jobStartPosition && position.x > this.jobStartPosition.x) {
         for (let x = this.jobStartPosition.x; x <= position.x; x++) {
           let tempJobPlacementPosition = this.jobStartPosition.clone();
@@ -122,7 +122,7 @@ class PlacementService {
       if (jobId > 0) {
         if (this.jobStartPosition) {
           let digPosition = position.clone();
-          if (jobId == 1) {
+          if (jobId === 1) {
             digPosition.y = this.jobStartPosition.y;
             this.placementPreview.SetCanPlace(MapService.Instance.CanPlaceDig(digPosition));
           } else {
@@ -131,7 +131,7 @@ class PlacementService {
           }
           this.BuildTempJobPath(digPosition, jobId);
         } else {
-          let canPlace = jobId == 1 ? MapService.Instance.CanPlaceDigStart(position) : MapService.Instance.CanPlaceStairStart(position);
+          let canPlace = jobId === 1 ? MapService.Instance.CanPlaceDigStart(position) : MapService.Instance.CanPlaceStairStart(position);
           this.placementPreview.SetCanPlace(canPlace);
         }
       }

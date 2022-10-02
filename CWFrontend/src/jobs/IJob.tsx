@@ -15,4 +15,5 @@ export interface IJob {
   Tick(delta: number): void;
   Work(dwarf: IDwarf): IGoal | null;
   IsCompleted(): boolean;
+  Destroy(): void;
 }
