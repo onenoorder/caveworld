@@ -152,7 +152,7 @@ class PlacementService {
     if (this.placementPreview.buildingId > 0) {
       let building = BuildingFactory.Build(this.placementPreview.buildingId, position.clone());
       
-      if (!EntityService.Instance.TryAddBuilding(building, this.placementPreview.buildingId)) {
+      if (!EntityService.Instance.TryAddBuilding(building)) {
         building.Destroy();
         this.PlaceBuilding(this.placementPreview.buildingId);
       }

@@ -32,7 +32,7 @@ class EntityService {
     EntityService.Instance = new EntityService(scene);
   }
 
-  TryAddBuilding(building: IBuilding, buildingId: number) {
+  TryAddBuilding(building: IBuilding) {
     let canPlace = MapService.Instance.CanPlace(building.position, building.height, building.width);
 
     if (canPlace) {
@@ -72,6 +72,10 @@ class EntityService {
 
   AddScaffold(scaffold: Scaffold) {
     this.scene.add(scaffold.BuildObject());
+  }
+
+  RemoveScaffold(scaffold: Scaffold) {
+    this.scene.remove(scaffold.object);
   }
 
   IsHouse(building: IBuilding): boolean {

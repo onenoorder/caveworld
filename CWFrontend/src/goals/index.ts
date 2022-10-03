@@ -11,3 +11,5 @@ export * from './FollowPathGoal';
 export * from './ConstructScaffoldingGoal';
 export * from './ConstructScaffoldGoal';
 export * from './ConstructBuildingGoal';
+export * from './DeconstructScaffoldingGoal';
+export * from './DeconstructScaffoldGoal';

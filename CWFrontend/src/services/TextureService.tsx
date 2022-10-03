@@ -6,6 +6,7 @@ class TextureService {
   texturesMap: string = 'textures/';
   buildingsMap: string = 'buildings/';
   excavationMaskTexturePrefix: string = 'excavation/ExcavationMask';
+  scaffoldTexturePrefix: string = 'construction/Scaffold';
   dwarfsMap: string = 'dwarf/';
 
   public static Instance: TextureService;
@@ -57,6 +58,10 @@ class TextureService {
 
   IsExcavationLoaded(number: number): boolean {
     return this.loaded.get(this.excavationMaskTexturePrefix + number.toString()) || false;
+  }
+
+  GetScaffoldTexture(number: number): Texture {
+    return this.GetTexture(this.scaffoldTexturePrefix + number.toString());
   }
 
   GetDwarfTexture(kind: string, job: string, number: number): Texture {

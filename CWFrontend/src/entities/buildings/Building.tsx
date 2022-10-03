@@ -62,10 +62,14 @@ abstract class Building implements IBuilding {
     } else if (this.state < 3 && this.buildProgress >= this.buildTotal * 0.75) {
       this.state = 3;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
-    } else if (this.state < 4 && this.buildProgress >= this.buildTotal) {
+    } else if (this.state < 4 && this.IsBuild()) {
       this.state = 4;
       (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetBuildingTextureWithState(this.name, this.state);
     }
+  }
+
+  IsBuild(): boolean {
+    return this.buildProgress >= this.buildTotal;
   }
 
   Tick(delta: number): void {}

@@ -42,7 +42,7 @@ class World {
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(9)), 2, 8);
 
     this.selectedEntity = mainHouse;
-    EntityService.Instance.TryAddBuilding(mainHouse, 0);
+    EntityService.Instance.TryAddBuilding(mainHouse);
 
     this.spawnService = new SpawnService(mainHouse.GetDoorPosition());
 

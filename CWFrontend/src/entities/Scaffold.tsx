@@ -1,35 +1,34 @@
 import { BufferGeometry, Material, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from 'three';
 import { TextureService } from '_services/index';
 import { IWithTextureService } from '_entities/index';
-import { IStack, Stack } from '_utilities/Stack';
+import { IQueue, Queue } from '_utilities/Queue';
 
 class Scaffold implements IWithTextureService {
 	position: Vector3;
 	object: Mesh<BufferGeometry, Material | Material[]>;
   state: number = 0;
   buildProgress: number = 0;
-  name: string = 'construction/Scaffold';
   endNumber: number;
-  numbers: IStack<number>;
+  numbers: IQueue<number>;
 
 	constructor(position: Vector3, endNumber: number) {
     this.position = position;
     this.position.z = 0.00001;
     this.endNumber = endNumber;
-    this.numbers = new Stack<number>();
+    this.numbers = new Queue<number>();
 
     if (this.endNumber === 6 || this.endNumber === 7) {
-      this.numbers.Push(0);
-      this.numbers.Push(1);
-      this.numbers.Push(2);
-      this.numbers.Push(3);
+      this.numbers.Enqueue(0);
+      this.numbers.Enqueue(1);
+      this.numbers.Enqueue(2);
+      this.numbers.Enqueue(3);
       if (this.endNumber === 6) {
-        this.numbers.Push(4);
+        this.numbers.Enqueue(4);
       } else if (this.endNumber === 7) {
-        this.numbers.Push(5);
+        this.numbers.Enqueue(5);
       }
     }
-    this.numbers.Push(endNumber);
+    this.numbers.Enqueue(endNumber);
 
     this.object = new Mesh();
   }
@@ -46,7 +45,7 @@ class Scaffold implements IWithTextureService {
 
   CreateMaterial(): Material {
     return new MeshBasicMaterial({ 
-      map: TextureService.Instance.GetTexture(this.name + this.state), 
+      map: TextureService.Instance.GetScaffoldTexture(this.state), 
       depthTest: false,
       transparent: true
     });
@@ -56,8 +55,8 @@ class Scaffold implements IWithTextureService {
     this.buildProgress += delta;
 
     if (!this.IsBuild()) {
-      this.state = this.numbers.Pop() || 0;
-      (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetTexture(this.name + this.state);
+      this.state = this.numbers.Dequeue() || 0;
+      (this.object.material as MeshBasicMaterial).map = TextureService.Instance.GetScaffoldTexture(this.state);
     }
   }
 

@@ -10,4 +10,5 @@ export interface IBuilding extends ITickableEntity, IWithTextureService {
   GetLeftCorner(): Vector3;
   GetRightCorner(): Vector3;
   Build(delta: number): void;
+  IsBuild(): boolean;
 }

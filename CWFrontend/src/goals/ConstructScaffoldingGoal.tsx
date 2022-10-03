@@ -1,16 +1,20 @@
 import { Vector3 } from 'three';
 import { MapService } from '_services/index';
-import { IDwarf } from '_entities/dwarfs/index';
-import { IBuilding } from '_entities/buildings/index';
+import { IDwarf } from '_dwarfs/index';
+import { IBuilding } from '_buildings/index';
 import { CompositeGoal, FollowPathGoal, WalkGoal, ConstructScaffoldGoal } from '_goals/index';
+import { IAddScaffold } from '_utilities/IAddScaffold';
 
 export class ConstructScaffoldingGoal extends CompositeGoal {
   building: IBuilding;
   starting: boolean = true;
+  addScaffold: IAddScaffold;
 
-  constructor(dwarf: IDwarf, building: IBuilding) {
+  constructor(dwarf: IDwarf, building: IBuilding, addScaffold: IAddScaffold) {
     super(dwarf, 'Build');
+
     this.building = building;
+    this.addScaffold = addScaffold;
   }
 
   Activate() {
@@ -25,7 +29,12 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
       for (let x = this.building.width - 1; x >= 0; x--) {
         let position: Vector3 = this.building.GetLeftCorner();
         position.add(new Vector3(x, y, 0));
-        this.subGoals.Push(new ConstructScaffoldGoal(this.dwarf, position, this.calculateScaffoldNumber(x, y)));
+
+        this.subGoals.Push(new ConstructScaffoldGoal(this.dwarf, position, this.CalculateScaffoldNumber(x, y), this.addScaffold));
+
+        if (x === this.building.width - 1) {
+          this.subGoals.Push(new ConstructScaffoldGoal(this.dwarf, position, this.CalculateScaffoldStairNumber(x, y), this.addScaffold));
+        }
         //this.subGoals.Push(new WalkGoal(this.dwarf, position));
       }
     }
@@ -34,16 +43,19 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
     this.completed = false;
   }
 
-  calculateScaffoldNumber(x: number, y: number) {
+  CalculateScaffoldNumber(x: number, y: number) {
     let scaffoldNumber;
 
-    if (y === 0) {
-      scaffoldNumber = x % 2 == 0 ? 8 : 9;
-    } else {
+    if (y % 2 == 0)
+      scaffoldNumber = x % 2 == 0 ? 7 : 6;
+    else
       scaffoldNumber = x % 2 == 0 ? 6 : 7;
-    }
 
     return scaffoldNumber;
+  }
+
+  CalculateScaffoldStairNumber(x: number, y: number) {
+    return x % 2 == 0 ? 8 : 9;
   }
 
   Run(delta: number): Vector3 {
