@@ -70,6 +70,12 @@ class Cave implements ITickableEntity, IWithTextureService {
     TextureService.Instance.GetExcavationTexture(152);
     TextureService.Instance.GetExcavationTexture(153);
 
+    // dig up
+    TextureService.Instance.GetExcavationTexture(359);
+
+    // dig down
+    TextureService.Instance.GetExcavationTexture(361);
+
     this.cave = [];
     this.caveNeedsUpdate = [];
     for(let x: number = 0; x < this.width; x++) {
@@ -109,22 +115,52 @@ class Cave implements ITickableEntity, IWithTextureService {
     for(let x: number = 0; x < this.width; x++)
       for(let y: number = 0; y < this.height; y++)
         if (cave[x][y]) {
-          let top = cave[x][y+1];
           let topLeft = cave[x-1][y+1];
+          let top = cave[x][y+1];
           let topRight = cave[x+1][y+1];
-          let right = cave[x+1][y];
-          let bottom = cave[x][y-1]
           let left = cave[x-1][y];
+          let right = cave[x+1][y];
+          let bottomLeft = cave[x-1][y-1];
+          let bottom = cave[x][y-1];
+          let bottomRight = cave[x+1][y-1];
           let number = 0;
 
           if (!top && right && bottom && !left) {
             number = 320;
           } else if (top && right && bottom && !left) {
-            number = 321;
+            if (!topRight && !bottomRight) {
+              number = 228;
+            } else if (topRight && !bottomRight) {
+              number = 235;
+            } else if (!topRight && bottomRight) {
+              number = 236;
+            } else {
+              number = 321;
+            }
           } else if (top && right && !bottom && !left) {
             number = 322;
           } else if (top && right && bottom && left) {
-            number = 336;
+            if (topLeft && topRight && bottomLeft && !bottomRight) {
+              number = 278;
+            } else if (topLeft && topRight && !bottomLeft && !bottomRight) {
+              number = 337;
+            } else if (topLeft && !topRight && !bottomLeft && !bottomRight) {
+              number = 301;
+            } else if (topLeft && !topRight && bottomLeft && !bottomRight) {
+              number = 279;
+            } else if (!topLeft && !topRight && bottomLeft && bottomRight) {
+              number = 296;
+            } else if (!topLeft && topRight && !bottomLeft && !bottomRight) {
+              number = 313;
+            } else if (!topLeft && topRight && bottomLeft && bottomRight) {
+              number = 312;
+            } else if (!topLeft && topRight && !bottomLeft && bottomRight) {
+              number = 311;
+            } else if (!topLeft && !topRight && !bottomLeft && bottomRight) {
+              number = 314;
+            } else {
+              number = 336;
+            }
           } else if (top && right && !bottom && left) {
             if (topLeft && topRight) {
               number = 337;
@@ -138,7 +174,11 @@ class Cave implements ITickableEntity, IWithTextureService {
           } else if (!top && !right && bottom && left) {
             number = 350;
           } else if (top && !right && bottom && left) {
-            number = 351;
+            if (!topLeft && !topRight && bottomLeft && !bottomRight) {
+              number = 250;
+            } else {
+              number = 351;
+            }
           } else if (top && !right && !bottom && left) {
             number = 352;
           } else if (!top && right && !bottom && !left) {
@@ -147,6 +187,12 @@ class Cave implements ITickableEntity, IWithTextureService {
             number = 349;
           } else if (!top && !right && !bottom && left) {
             number = 364;
+          } else if (!top && !right && bottom && !left) {
+            number = 359;
+          } else if (top && !right && !bottom && !left) {
+            number = 361;
+          } else if (top && !right && bottom && !left) {
+            number = 360;
           }
 
           if (number !== this.cave[x][y]) {
@@ -164,22 +210,24 @@ class Cave implements ITickableEntity, IWithTextureService {
   }
 
   Tick(delta: number) {
-    if (this.changed) {
-      this.count++;
-      if (this.count > 10) {
-        this.count = 0;
-        if (TextureService.Instance.IsLoaded(this.mapTextureId)) {
-          this.changed = false;
-          for(let x: number = 0; x < this.width; x++)
-            for(let y: number = 0; y < this.height; y++)
-              if (this.caveNeedsUpdate[x][y] && this.cave[x][y] !== 0) {
-                if (TextureService.Instance.IsExcavationLoaded(this.cave[x][y])) {
-                  this.renderer.copyTextureToTexture(new THREE.Vector2(x * this.textureUnitSize, y * this.textureUnitSize), TextureService.Instance.GetExcavationTexture(this.cave[x][y]), this.texture);
-                  this.caveNeedsUpdate[x][y] = false;
-                } else {
-                  this.changed = true;
-                }
+    this.count += delta;
+
+    if (this.changed && this.count > 10) {
+      this.count = 0;
+
+      if (TextureService.Instance.IsLoaded(this.mapTextureId)) {
+        this.changed = false;
+        for(let x: number = 0; x < this.width; x++) {
+          for(let y: number = 0; y < this.height; y++) {
+            if (this.caveNeedsUpdate[x][y] && this.cave[x][y] !== 0) {
+              if (TextureService.Instance.IsExcavationLoaded(this.cave[x][y])) {
+                this.renderer.copyTextureToTexture(new THREE.Vector2(x * this.textureUnitSize, y * this.textureUnitSize), TextureService.Instance.GetExcavationTexture(this.cave[x][y]), this.texture);
+                this.caveNeedsUpdate[x][y] = false;
+              } else {
+                this.changed = true;
               }
+            }
+          }
         }
       }
     }

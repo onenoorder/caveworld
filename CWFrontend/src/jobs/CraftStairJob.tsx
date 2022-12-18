@@ -6,11 +6,11 @@ class CraftStairJob extends CraftJob {
   constructor(startPosition: Vector3, endPosition: Vector3) {
     super(0, 0, 'CraftStair', 0, 1, startPosition, endPosition);
 
-    let direction = startPosition.x > endPosition.x ? +1 : -1;
-    for(let x = endPosition.x; x !== startPosition.x; x += direction) {
+    let direction = startPosition.y > endPosition.y ? +1 : -1;
+    for(let y = endPosition.y; y !== startPosition.y; y += direction) {
       let digSite = startPosition.clone();
-      digSite.x = x;
-      let digStartPosition = digSite.clone().add(new Vector3(direction));
+      digSite.y = y;
+      let digStartPosition = digSite.clone().add(new Vector3(0, direction));
       this.tasks.Push(new CraftStairTask(digSite, digStartPosition));
     }
   }

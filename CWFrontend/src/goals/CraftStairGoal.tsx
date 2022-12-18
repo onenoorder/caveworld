@@ -10,12 +10,13 @@ export class CraftStairGoal extends CompositeGoal {
   lastDig: number = 0;
   direction: number;
   starting: boolean = true;
+  halfWayThere: boolean = false;
 
   constructor(dwarf: IDwarf, target: Vector3, startPosition: Vector3) {
     super(dwarf, 'Dig');
     this.target = target;
     this.startPosition = startPosition;
-    this.direction = this.startPosition.x > this.target.x ? -1 : 1;
+    this.direction = this.startPosition.y > this.target.y ? -1 : 1;
     this.state = 12;
   }
 
@@ -43,20 +44,24 @@ export class CraftStairGoal extends CompositeGoal {
 
   GetCaveTexture(): number {
     if (this.direction > 0) {
-      return 160 + this.digProgress / 14;
+      return this.digProgress / 14;
     } else {
-      return 144 + this.digProgress / 14;
+      return 48 + this.digProgress / 14;
     }
+  }
+
+  GetMaxState(): number {
+    return this.direction > 0 ? 19 : 20;
   }
 
   Dig() {
     this.digProgress += 1;
     this.lastDig = 0;
-    this.state += 1;
-    if (this.state > 14)
-      this.state = 0;
-    if (this.state > 0 && this.state < 4) {
-      this.dwarf.position.x += this.direction * 0.025;
+    this.state += this.halfWayThere ? -1 : 1;
+
+    if (this.state >= this.GetMaxState()) {
+      this.halfWayThere = true;
+    } else if (this.state === 0) {
       MapService.Instance.UpdateCaveTextureOnPosition(this.target, this.GetCaveTexture());
     }
   }
@@ -64,8 +69,8 @@ export class CraftStairGoal extends CompositeGoal {
   Run(delta: number): Vector3 {
     let returnValue = super.Run(delta);
 
-    if (this.completed && ((this.direction > 0 && this.dwarf.position.x >= this.startPosition.x) ||
-      (this.direction < 0 && this.dwarf.position.x <= this.startPosition.x))) {
+    if (this.completed && ((this.direction > 0 && this.dwarf.position.y >= this.startPosition.y) ||
+      (this.direction < 0 && this.dwarf.position.y <= this.startPosition.y))) {
       this.lastDig += delta;
 
       if (this.starting && this.lastDig > 0.5) {

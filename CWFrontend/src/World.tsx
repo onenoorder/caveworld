@@ -33,6 +33,10 @@ class World {
     this.userInput = new UserInput(this.container, this.camera, this.renderer);
 
     this.container.append(this.renderer.domElement);
+    this.renderer.domElement.addEventListener("webglcontextlost", function(event) {
+      console.log('lost');
+      event.preventDefault();
+  }, false);
 
     this.clock = new THREE.Clock();
 

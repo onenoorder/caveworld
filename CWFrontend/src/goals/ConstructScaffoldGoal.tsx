@@ -32,7 +32,7 @@ export class ConstructScaffoldGoal extends Goal {
       if (this.state > 4) {
         this.currentScaffoldNumber++;
 
-        if (this.currentScaffoldNumber == 1) {
+        if (this.currentScaffoldNumber === 1) {
           EntityService.Instance.AddScaffold(this.scaffold);
           this.addScaffold.AddScaffold(this.scaffold);
         } else {

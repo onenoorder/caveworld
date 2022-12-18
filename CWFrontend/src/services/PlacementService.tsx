@@ -1,5 +1,5 @@
 import { Vector3 } from 'three';
-import { BuildingFactory, JobFactory } from '_factories/index';
+import { BuildingFactory, ConstructionFactory, JobFactory } from '_factories/index';
 import { Placement, TempJobPlacement } from '_entities/index';
 import { EntityService, MapService } from '_services/index';
 
@@ -166,7 +166,9 @@ class PlacementService {
         this.jobStartPosition = position.clone();
         this.BuildTempJobPath(position, jobId);
       } else if (this.placementPreview.canPlace) {
-        EntityService.Instance.AddJob(JobFactory.Build(jobId, this.jobStartPosition.clone(), position.clone()));
+        let job = JobFactory.Build(jobId, this.jobStartPosition.clone(), position.clone());
+        EntityService.Instance.AddJob(job);
+        EntityService.Instance.AddConstruction(ConstructionFactory.BuildFromJob(job));
         this.PlaceJob(jobId);
       } else {
         this.PlaceJob(jobId);

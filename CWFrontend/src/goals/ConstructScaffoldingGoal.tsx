@@ -11,7 +11,7 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
   addScaffold: IAddScaffold;
 
   constructor(dwarf: IDwarf, building: IBuilding, addScaffold: IAddScaffold) {
-    super(dwarf, 'Build');
+    super(dwarf, 'Idle');
 
     this.building = building;
     this.addScaffold = addScaffold;
@@ -32,7 +32,7 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
 
         this.subGoals.Push(new ConstructScaffoldGoal(this.dwarf, position, this.CalculateScaffoldNumber(x, y), this.addScaffold));
 
-        if (x === this.building.width - 1) {
+        if (x === this.building.width - 1 && y !== this.building.height - 1) {
           this.subGoals.Push(new ConstructScaffoldGoal(this.dwarf, position, this.CalculateScaffoldStairNumber(x, y), this.addScaffold));
         }
         //this.subGoals.Push(new WalkGoal(this.dwarf, position));
@@ -46,16 +46,16 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
   CalculateScaffoldNumber(x: number, y: number) {
     let scaffoldNumber;
 
-    if (y % 2 == 0)
-      scaffoldNumber = x % 2 == 0 ? 7 : 6;
+    if (y % 2 === 0)
+      scaffoldNumber = x % 2 === 0 ? 7 : 6;
     else
-      scaffoldNumber = x % 2 == 0 ? 6 : 7;
+      scaffoldNumber = x % 2 === 0 ? 6 : 7;
 
     return scaffoldNumber;
   }
 
   CalculateScaffoldStairNumber(x: number, y: number) {
-    return x % 2 == 0 ? 8 : 9;
+    return x % 2 === 0 ? 8 : 9;
   }
 
   Run(delta: number): Vector3 {
