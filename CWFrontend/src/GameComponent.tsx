@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { PlacementService } from '_services/index';
 import World from './World';
+import { BuildingIds } from 'utilities/Enums/BuildingIds';
 
 class GameComponent extends Component {
   container: any;
@@ -31,14 +32,14 @@ class GameComponent extends Component {
         <img style={{width:"32px", height:"32px", float:"left", objectFit:"scale-down"}} alt="Stair" src={"textures/Stair.png"} onClick={() => PlacementService.Instance.PlaceJob(2)} />
       </div>
       <div style={{width:"100%", height:"40px", position:"absolute", bottom:0}}>
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="TinyHouse" src={"textures/buildings/TinyHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(1)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="SmallHouse" src={"textures/buildings/SmallHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(2)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="MediumHouse" src={"textures/buildings/MediumHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(3)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="BigHouse" src={"textures/buildings/BigHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(4)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="HugeHouse" src={"textures/buildings/HugeHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(5)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="SmallStorageHouse" src={"textures/buildings/SmallStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(6)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="MediumStorageHouse" src={"textures/buildings/MediumStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(7)} />
-        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="BigStorageHouse" src={"textures/buildings/BigStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(8)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="TinyHouse" src={"textures/buildings/TinyHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.TinyHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="SmallHouse" src={"textures/buildings/SmallHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.SmallHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="MediumHouse" src={"textures/buildings/MediumHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.MediumHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="BigHouse" src={"textures/buildings/BigHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.BigHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="HugeHouse" src={"textures/buildings/HugeHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.HugeHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="SmallStorageHouse" src={"textures/buildings/SmallStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.SmallStorageHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="MediumStorageHouse" src={"textures/buildings/MediumStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.MediumStorageHouse)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="BigStorageHouse" src={"textures/buildings/BigStorageHouse.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.BigStorageHouse)} />
       </div>
     </>);
   }

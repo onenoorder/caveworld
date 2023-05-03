@@ -63,6 +63,7 @@ export class CraftStairGoal extends CompositeGoal {
       this.halfWayThere = true;
     } else if (this.state === 0) {
       MapService.Instance.UpdateCaveTextureOnPosition(this.target, this.GetCaveTexture());
+      this.halfWayThere = false;
     }
   }
 

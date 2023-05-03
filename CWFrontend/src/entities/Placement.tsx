@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { TextureService } from '_services/index';
 import { IEntity, IWithTextureService } from '_entities/index';
+import { BuildingIds } from 'utilities/Enums/BuildingIds';
 
 class Placement implements IEntity, IWithTextureService {
   position: THREE.Vector3;
@@ -8,7 +9,7 @@ class Placement implements IEntity, IWithTextureService {
   texture: THREE.Texture;
   height: number;
   width: number;
-  buildingId: number;
+  buildingId: BuildingIds;
   jobId: number;
   textureHeight: number = 1449;
   textureWidth: number = 1163;
@@ -45,11 +46,11 @@ class Placement implements IEntity, IWithTextureService {
     }
   }
 
-  SetBuilding(buildingId: number) {
+  SetBuilding(buildingId: BuildingIds) {
     this.buildingId = buildingId;
     
     switch(this.buildingId) {
-      case 1:
+      case BuildingIds.TinyHouse:
         this.height = 2;
         this.width = 2;
         if (this.canPlace) {
@@ -60,7 +61,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 26) + 8);
         }
       break;
-      case 2:
+      case BuildingIds.SmallHouse:
         this.height = 3;
         this.width = 3;
         if (this.canPlace) {
@@ -71,7 +72,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 13) + 4);
         }
       break;
-      case 3:
+      case BuildingIds.MediumHouse:
         this.height = 3;
         this.width = 2;
         if (this.canPlace) {
@@ -82,7 +83,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 27) + 9);
         }
       break;
-      case 4:
+      case BuildingIds.BigHouse:
         this.height = 3;
         this.width = 4;
         if (this.canPlace) {
@@ -93,7 +94,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 4) + 1);
         }
       break;
-      case 5:
+      case BuildingIds.HugeHouse:
         this.height = 4;
         this.width = 5;
         if (this.canPlace) {
@@ -104,7 +105,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 0;
         }
       break;
-      case 6:
+      case BuildingIds.SmallStorageHouse:
         this.height = 2;
         this.width = 2;
         if (this.canPlace) {
@@ -115,7 +116,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 28) + 9);
         }
       break;
-      case 7:
+      case BuildingIds.MediumStorageHouse:
         this.height = 2;
         this.width = 4;
         if (this.canPlace) {
@@ -126,7 +127,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 28) + 9);
         }
       break;
-      case 8:
+      case BuildingIds.BigStorageHouse:
         this.height = 3;
         this.width = 4;
         if (this.canPlace) {

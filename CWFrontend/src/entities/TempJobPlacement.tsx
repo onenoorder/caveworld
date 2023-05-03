@@ -29,6 +29,7 @@ class TempJobPlacement implements IEntity, IWithTextureService {
     this.object.position.x += 0.5;
     this.object.position.y += 0.5;
     this.object.position.z = 0.000015;
+    this.object.renderOrder = 800;
 
     if (this.canPlace) {
       this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 1) + 1);

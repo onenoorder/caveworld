@@ -15,6 +15,7 @@ class Cave implements ITickableEntity, IWithTextureService {
   textureUnitSize: number = 48;
   mapTextureId: string = 'Map8k';
   changed: boolean = false;
+  forceUpdate: boolean = false;
   cave: number[][];
   caveNeedsUpdate: boolean[][];
 
@@ -170,7 +171,11 @@ class Cave implements ITickableEntity, IWithTextureService {
               number = 270;
             }
           } else if (!top && right && bottom && left) {
-            number = 335;
+            if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
+              number = 338;
+            } else {
+              number = 335;
+            }
           } else if (!top && !right && bottom && left) {
             number = 350;
           } else if (top && !right && bottom && left) {
@@ -207,16 +212,18 @@ class Cave implements ITickableEntity, IWithTextureService {
     this.cave[x][y] = textureId;
     this.caveNeedsUpdate[x][y] = true;
     this.changed = true;
+    this.forceUpdate = true;
   }
 
   Tick(delta: number) {
     this.count += delta;
 
-    if (this.changed && this.count > 10) {
+    if (this.forceUpdate || (this.changed && this.count > 10)) {
       this.count = 0;
 
       if (TextureService.Instance.IsLoaded(this.mapTextureId)) {
         this.changed = false;
+
         for(let x: number = 0; x < this.width; x++) {
           for(let y: number = 0; y < this.height; y++) {
             if (this.caveNeedsUpdate[x][y] && this.cave[x][y] !== 0) {
@@ -229,6 +236,8 @@ class Cave implements ITickableEntity, IWithTextureService {
             }
           }
         }
+
+        this.forceUpdate = false;
       }
     }
   }

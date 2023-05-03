@@ -2,6 +2,7 @@ import { Vector3 } from 'three';
 import { BuildingFactory, ConstructionFactory, JobFactory } from '_factories/index';
 import { Placement, TempJobPlacement } from '_entities/index';
 import { EntityService, MapService } from '_services/index';
+import { BuildingIds } from 'utilities/Enums/BuildingIds';
 
 class PlacementService {
   scene: THREE.Scene;
@@ -78,7 +79,7 @@ class PlacementService {
     }
   }
 
-  PlaceBuilding(buildingId: number) {
+  PlaceBuilding(buildingId: BuildingIds) {
     if (this.placementPreview.jobId > 0) {
       this.placementPreview.jobId = 0;
       this.jobStartPosition = null;
@@ -88,7 +89,7 @@ class PlacementService {
     if (buildingId === this.placementPreview.buildingId) {
       this.scene.remove(this.placementPreview.object);
       this.placementPreview.SetBuilding(0);
-    } else if (this.placementPreview.buildingId === 0) {
+    } else if (this.placementPreview.buildingId === BuildingIds.MainHouse) {
       this.placementPreview.SetBuilding(buildingId);
       this.scene.add(this.placementPreview.BuildObject());
     } else {
