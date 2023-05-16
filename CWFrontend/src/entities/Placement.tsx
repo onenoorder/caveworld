@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TextureService } from '_services/index';
 import { IEntity, IWithTextureService } from '_entities/index';
-import { BuildingIds } from 'utilities/Enums/BuildingIds';
+import { BuildingIds } from '_utilities/Enums/BuildingIds';
 
 class Placement implements IEntity, IWithTextureService {
   position: THREE.Vector3;

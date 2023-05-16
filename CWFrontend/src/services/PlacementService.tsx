@@ -2,7 +2,7 @@ import { Vector3 } from 'three';
 import { BuildingFactory, ConstructionFactory, JobFactory } from '_factories/index';
 import { Placement, TempJobPlacement } from '_entities/index';
 import { EntityService, MapService } from '_services/index';
-import { BuildingIds } from 'utilities/Enums/BuildingIds';
+import { BuildingIds } from '_utilities/Enums/BuildingIds';
 
 class PlacementService {
   scene: THREE.Scene;

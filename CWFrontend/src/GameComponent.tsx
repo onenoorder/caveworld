@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { PlacementService } from '_services/index';
 import World from './World';
-import { BuildingIds } from 'utilities/Enums/BuildingIds';
+import { BuildingIds } from '_utilities/Enums/BuildingIds';
 
 class GameComponent extends Component {
   container: any;
