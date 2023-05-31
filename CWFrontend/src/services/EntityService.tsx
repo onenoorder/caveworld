@@ -6,12 +6,13 @@ import { IBuilding } from '_buildings/index';
 import { IConstruction } from '_constructions/index';
 import { IJob } from '_jobs/index';
 import { ConstructionFactory } from '_factories/ConstructionFactory';
-import { Scaffold } from '_entities/index';
+import { Scaffold, Stair } from '_entities/index';
 
 class EntityService {
   scene: THREE.Scene;
   buildings: IBuilding[];
   constructions: IConstruction[];
+  stairs: Stair[];
   houses: IHouse[];
   dwarfs: IDwarf[];
 
@@ -21,6 +22,7 @@ class EntityService {
     this.scene = scene;
     this.buildings = [];
     this.constructions = [];
+    this.stairs = [];
     this.houses = [];
     this.dwarfs = [];
   }
@@ -90,6 +92,23 @@ class EntityService {
   AddJob(job: IJob) {
     JobService.Instance.AddJob(job);
     //this.scene.add(job.BuildObject());
+  }
+
+  AddStair(stair: Stair) {
+    this.stairs.push(stair);
+    this.scene.add(stair.BuildObject());
+    MapService.Instance.Build(stair.position, 1, 1);
+    MapService.Instance.SetClimbable(stair.position);
+  }
+
+  HasStair(position: THREE.Vector3) : Boolean {
+    this.stairs.forEach((stair) => {
+      if (stair.position.x == position.x && stair.position.y == position.y) {
+        return true;
+      }
+    });
+
+    return false;
   }
 
   Destroy() {

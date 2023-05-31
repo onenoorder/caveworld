@@ -3,19 +3,20 @@ import { Vector3 } from 'three';
 import { IDwarf } from '_entities/dwarfs/index';
 import { CompositeGoal, FollowPathGoal } from '_goals/index';
 
-export class DigGoal extends CompositeGoal {
+export class DigStairGoal extends CompositeGoal {
   target: Vector3;
   startPosition: Vector3;
   digProgress: number = 0;
   lastDig: number = 0;
   direction: number;
   starting: boolean = true;
+  halfWayThere: boolean = false;
 
   constructor(dwarf: IDwarf, target: Vector3, startPosition: Vector3) {
     super(dwarf, 'Dig');
     this.target = target;
     this.startPosition = startPosition;
-    this.direction = this.startPosition.x > this.target.x ? -1 : 1;
+    this.direction = this.startPosition.y > this.target.y ? -1 : 1;
     this.state = 12;
   }
 
@@ -29,6 +30,9 @@ export class DigGoal extends CompositeGoal {
 
     this.subGoals.Push(new FollowPathGoal(this.dwarf, MapService.Instance.paths.ShortestUnweightedPath(from, this.startPosition)));
     this.completed = MapService.Instance.IsFree(this.target);
+    if (this.completed) {
+      this.subGoals.Push(new FollowPathGoal(this.dwarf, MapService.Instance.paths.ShortestUnweightedPath(from, this.target)));
+    }
   }
 
   GetName(): string {
@@ -37,35 +41,45 @@ export class DigGoal extends CompositeGoal {
     } else if (this.starting) {
       return 'DigDown';
     } else {
-      return this.direction < 0 ? 'DigLeft' : 'DigRight';
+      return this.direction < 0 ? 'DigDown' : 'DigUp';
     }
   }
 
   GetCaveTexture(): number {
     if (this.direction > 0) {
-      return 160 + this.digProgress / 14;
+      return this.digProgress / 14;
     } else {
-      return 144 + this.digProgress / 14;
+      return 48 + this.digProgress / 14;
     }
+  }
+
+  GetMaxState(): number {
+    return this.direction > 0 ? 19 : 20;
   }
 
   Dig() {
     this.digProgress += 1;
     this.lastDig = 0;
-    this.state += 1;
-    if (this.state > 14)
-      this.state = 0;
-    if (this.state > 0 && this.state < 4) {
-      this.dwarf.position.x += this.direction * 0.025;
+    this.state += this.halfWayThere ? -1 : 1;
+
+    if (this.state >= this.GetMaxState()) {
+      this.halfWayThere = true;
+    } else if (this.state === 0) {
       MapService.Instance.UpdateCaveTextureOnPosition(this.target, this.GetCaveTexture());
+      this.halfWayThere = false;
+    }
+
+    if ((this.direction > 0 && this.state > 4 && this.state < 9) ||
+      (this.direction < 0 && this.state > 9 && this.state < 15)) {
+      this.dwarf.position.y += this.direction * 0.025;
     }
   }
 
   Run(delta: number): Vector3 {
     let returnValue = super.Run(delta);
 
-    if (this.completed && ((this.direction > 0 && this.dwarf.position.x >= this.startPosition.x) ||
-      (this.direction < 0 && this.dwarf.position.x <= this.startPosition.x))) {
+    if (this.completed && ((this.direction > 0 && this.dwarf.position.y >= this.startPosition.y) ||
+      (this.direction < 0 && this.dwarf.position.y <= this.startPosition.y))) {
       this.lastDig += delta;
 
       if (this.starting && this.lastDig > 0.5) {

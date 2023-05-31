@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TextureService } from '_services/index';
 import { IEntity, IWithTextureService } from '_entities/index';
-import { BuildingIds } from '_utilities/Enums/BuildingIds';
+import { BuildingIds, JobIds } from '_utilities/Enums';
 
 class Placement implements IEntity, IWithTextureService {
   position: THREE.Vector3;
@@ -154,7 +154,7 @@ class Placement implements IEntity, IWithTextureService {
     this.width = 1;
 
     switch(this.jobId) {
-      case 1:
+      case JobIds.Dig:
         if (this.canPlace) {
           this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 21) + 9);
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 28) + 8);
@@ -163,7 +163,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 28) + 8);
         }
       break;
-      case 2:
+      case JobIds.Stair:
         if (this.canPlace) {
           this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 23) + 12);
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 28) + 8);

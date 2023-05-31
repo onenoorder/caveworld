@@ -2,7 +2,7 @@ import { Vector3 } from 'three';
 import { BuildingFactory, ConstructionFactory, JobFactory } from '_factories/index';
 import { Placement, TempJobPlacement } from '_entities/index';
 import { EntityService, MapService } from '_services/index';
-import { BuildingIds } from '_utilities/Enums/BuildingIds';
+import { BuildingIds, JobIds } from '_utilities/Enums';
 
 class PlacementService {
   scene: THREE.Scene;
@@ -123,7 +123,7 @@ class PlacementService {
       if (jobId > 0) {
         if (this.jobStartPosition) {
           let digPosition = position.clone();
-          if (jobId === 1) {
+          if (jobId === JobIds.Dig) {
             digPosition.y = this.jobStartPosition.y;
             this.placementPreview.SetCanPlace(MapService.Instance.CanPlaceDig(digPosition));
           } else {
@@ -132,7 +132,7 @@ class PlacementService {
           }
           this.BuildTempJobPath(digPosition, jobId);
         } else {
-          let canPlace = jobId === 1 ? MapService.Instance.CanPlaceDigStart(position) : MapService.Instance.CanPlaceStairStart(position);
+          let canPlace = jobId === JobIds.Dig ? MapService.Instance.CanPlaceDigStart(position) : MapService.Instance.CanPlaceStairStart(position);
           this.placementPreview.SetCanPlace(canPlace);
         }
       }

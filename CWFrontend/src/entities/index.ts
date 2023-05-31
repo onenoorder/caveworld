@@ -9,3 +9,4 @@ export * from './constructions';
 export * from './buildings';
 export * from './dwarfs';
 export * from './Scaffold';
+export * from './Stair';

@@ -11,6 +11,7 @@ class MapService {
   cave: Cave;
   buildable: boolean[][];
   workable: boolean[][];
+  climbable: boolean[][];
   walkLevel: number = 0.01;
   paths: IGraph;
 
@@ -31,13 +32,16 @@ class MapService {
 
     this.buildable = [];
     this.workable = [];
+    this.climbable = [];
 
     for(let x: number = 0; x < this.width; x++) {
       this.buildable[x] = [];
       this.workable[x] = [];
+      this.climbable[x] = [];
       for(let y: number = 0; y< this.height; y++) {
         this.buildable[x][y] = false;
         this.workable[x][y] = false;
+        this.climbable[x][y] = false;
       }
     }
   }
@@ -78,10 +82,12 @@ class MapService {
       position.x < 0 || position.y < 0)
       return false;
 
-    if (!this.workable[position.x][position.y] || this.workable[position.x][position.y - 1])
+    if (!this.workable[position.x][position.y] || (this.workable[position.x][position.y - 1] && !this.climbable[position.x][position.y - 1]))
       return false;
     
-    return !this.workable[position.x + 1][position.y] || !this.workable[position.x - 1][position.y];
+    return !this.workable[position.x + 1][position.y] || 
+      !this.workable[position.x - 1][position.y] ||
+      this.climbable[position.x][position.y];
   }
 
   CanPlaceDig(position: Vector3): boolean {
@@ -90,7 +96,7 @@ class MapService {
       position.x < 0 || position.y < 0)
       return false;
     
-    return !this.workable[position.x][position.y];
+    return !this.workable[position.x][position.y] || this.climbable[position.x][position.y];
   }
 
   CanPlaceStair(position: Vector3): boolean {
@@ -108,10 +114,15 @@ class MapService {
       position.x < 0 || position.y < 0)
       return false;
 
-      if (!this.workable[position.x][position.y] || this.workable[position.x][position.y - 1])
+    if (!this.workable[position.x][position.y] || this.workable[position.x][position.y - 1])
+      return false;
+
+    if (!this.buildable[position.x][position.y] && !this.climbable[position.x][position.y])
       return false;
     
-    return !this.workable[position.x][position.y + 1] || !this.workable[position.x][position.y - 1];
+    return !this.workable[position.x][position.y + 1] || 
+      !this.workable[position.x][position.y - 1] || 
+      this.climbable[position.x][position.y];
   }
 
   CanBeReached(position: Vector3): boolean {
@@ -139,6 +150,18 @@ class MapService {
     }
     
     this.cave.Rebuild(this.workable);
+  }
+
+  IsFree(position: Vector3) : boolean {
+    return this.workable[position.x][position.y];
+  }
+
+  IsClimbable(position: Vector3) : boolean {
+    return this.climbable[position.x][position.y];
+  }
+
+  SetClimbable(position: Vector3) {
+    this.climbable[position.x][position.y] = true;
   }
 
   UpdateCaveTextureOnPosition(position: Vector3, textureId: number) {
