@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:15.5.0-alpine3.10
+FROM node:22-alpine3.19
 
 # set working directory
 WORKDIR ../
@@ -12,7 +12,7 @@ COPY package.json ./
 COPY package-lock.json ./
 #COPY ./node_modules ./node_modules
 RUN npm install --silent
-RUN npm install react-scripts@3.4.3 -g --silent
+RUN npm install react-scripts@5.0.1 -g --silent
 
 # add app
 #COPY . ./

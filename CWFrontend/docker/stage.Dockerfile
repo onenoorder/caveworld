@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:15.5.0-alpine3.10 as build
+FROM node:22-alpine3.19 as build
 
 # set working directory
 WORKDIR ../
@@ -11,7 +11,7 @@ ENV PATH ../node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install --silent
-RUN npm install react-scripts@3.4.3 -g --silent
+RUN npm install react-scripts@5.0.1 -g --silent
 
 # add app
 COPY . ./
@@ -19,7 +19,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginx:1.15
+FROM nginx:1.27.2
 COPY --from=build /build /usr/share/nginx/html
 # new
 COPY nginx.conf /etc/nginx/conf.d/default.conf
