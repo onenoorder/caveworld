@@ -34,7 +34,8 @@ export class WalkGoal extends Goal {
     let returnValue = this.seekBehavior.Execute(this.target.clone());
 
     if ((this.dwarf.direction.x > 0 && this.dwarf.position.x >= this.target.x) ||
-      (this.dwarf.direction.x < 0 && this.dwarf.position.x <= this.target.x)) {
+      (this.dwarf.direction.x < 0 && this.dwarf.position.x <= this.target.x) ||
+      this.dwarf.position.x === this.target.x) {
       this.completed = true;
       this.dwarf.velocity = new Vector3(0, 0, 0);
       this.dwarf.position = this.target.clone();

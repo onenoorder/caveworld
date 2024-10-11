@@ -3,6 +3,7 @@ export { Goal } from './Goal';
 export * from './CompositeGoal';
 export * from './LifeGoal';
 export * from './WalkGoal';
+export * from './ClimbGoal';
 export * from './TurnGoal';
 export * from './IdleGoal';
 export * from './DigGoal';

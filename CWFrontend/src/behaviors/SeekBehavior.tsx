@@ -12,10 +12,11 @@ class SeekBehavior extends Behavior {
       return velocity;
     }
 
-    let desiredVelocity = target.min(this.dwarf.position);
+    let desiredVelocity = target.clone().min(this.dwarf.position);
 
-    if (desiredVelocity.x > this.dwarf.maxSpeed.x)
+    if (desiredVelocity.x > this.dwarf.maxSpeed.x) {
       desiredVelocity.x = this.dwarf.maxSpeed.x;
+    }
 
     desiredVelocity.z = 0;
     desiredVelocity.y = 0;

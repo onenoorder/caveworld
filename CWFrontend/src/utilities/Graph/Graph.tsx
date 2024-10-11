@@ -1,5 +1,4 @@
 import { Vector3 } from 'three';
-import { pathToFileURL } from 'url';
 import { Queue } from '_utilities/index';
 import { IGraph, GraphNode } from '.';
 

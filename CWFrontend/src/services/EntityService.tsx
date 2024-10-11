@@ -103,7 +103,7 @@ class EntityService {
 
   HasStair(position: THREE.Vector3) : Boolean {
     this.stairs.forEach((stair) => {
-      if (stair.position.x == position.x && stair.position.y == position.y) {
+      if (stair.position.x === position.x && stair.position.y === position.y) {
         return true;
       }
     });
