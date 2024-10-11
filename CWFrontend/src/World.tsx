@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { IEntity } from 'entities';
-import { TextureService, EntityService, SpawnService, MapService, PlacementService, JobService } from '_services/index';
-import UserInput from './UserInput';
+import { TextureService, EntityService, SpawnService, MapService, PlacementService, JobService, InteractiontService } from '_services/index';
+import { UserInput } from '_controls/index';
 import { MainHouse } from '_houses/index';
 
 class World {
@@ -28,6 +28,7 @@ class World {
     JobService.Setup();
     MapService.Setup(this.scene, this.renderer, 135, 240);
 
+    InteractiontService.Setup(this.scene);
     EntityService.Setup(this.scene);
     PlacementService.Setup(this.scene);
     this.userInput = new UserInput(this.container, this.camera, this.renderer);
@@ -59,6 +60,7 @@ class World {
     this.clock.stop();
 
     TextureService.Instance.Destroy();
+    InteractiontService.Instance.Destroy();
     MapService.Instance.Destroy();
     EntityService.Instance.Destroy();
     PlacementService.Instance.Destroy();
