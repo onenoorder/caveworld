@@ -101,12 +101,14 @@ class PlacementService {
     if (this.placementPreview.buildingId > 0)
       this.placementPreview.buildingId = 0;
 
-    if (jobId === this.placementPreview.jobId) {
+    let noJobActive = this.placementPreview.jobId === 0;
+
+    if (jobId === this.placementPreview.jobId || (!noJobActive && jobId !== this.placementPreview.jobId)) {
       this.scene.remove(this.placementPreview.object);
       this.placementPreview.SetJob(0);
       this.jobStartPosition = null;
       this.DestroyTempJobPlacements();
-    } else if (this.placementPreview.jobId === 0) {
+    } else if (noJobActive) {
       this.placementPreview.SetJob(jobId);
       this.scene.add(this.placementPreview.BuildObject());
     } else {

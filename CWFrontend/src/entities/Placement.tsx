@@ -138,6 +138,116 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 7) + 2);
         }
       break;
+      case BuildingIds.Woodworks:
+        this.height = 3;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 13) + 6);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 13) + 6);
+        }
+      break;
+      case BuildingIds.Stoneworks:
+        this.height = 3;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 4) + 2);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 4) + 2);
+        }
+      break;
+      case BuildingIds.Steelworks:
+        this.height = 3;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 5);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 5);
+        }
+      break;
+      case BuildingIds.Waterworks:
+        this.height = 4;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 19) + 6);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 19) + 6);
+        }
+      break;
+      case BuildingIds.ToolFactory:
+        this.height = 3;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 10) + 4);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 10) + 4);
+        }
+      break;
+      case BuildingIds.CogwheelFactory:
+        this.height = 3;
+        this.width = 5;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 7) + 7);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 7) + 7);
+        }
+      break;
+      case BuildingIds.FoodFactory:
+        this.height = 3;
+        this.width = 4;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 4) + 1);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 22) + 8);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * (this.textureUnitSize * 0);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 22) + 8);
+        }
+      break;
+      case BuildingIds.CharcoalBurner:
+        this.height = 3;
+        this.width = 4;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 4) + 1);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 25) + 8);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * (this.textureUnitSize * 0);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 25) + 8);
+        }
+      break;
+      case BuildingIds.Laboratory:
+        this.height = 3;
+        this.width = 4;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 13) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 23) + 6);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 8) + 2);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 23) + 6);
+        }
+      break;
+      case BuildingIds.CrystalLoadingstation:
+        this.height = 3;
+        this.width = 4;
+        if (this.canPlace) {
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 4) + 1);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 10) + 4);
+        } else {
+          this.texture.offset.x = 1 / this.textureWidth * (this.textureUnitSize * 0);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 10) + 4);
+        }
+      break;
     }
 
     this.texture.repeat.x = 1 / this.textureWidth * (this.textureUnitSize * this.width);

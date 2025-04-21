@@ -7,5 +7,15 @@ export enum BuildingIds {
   HugeHouse,
   SmallStorageHouse,
   MediumStorageHouse,
-  BigStorageHouse
+  BigStorageHouse,
+  Woodworks,
+  Stoneworks,
+  Steelworks,
+  Waterworks,
+  CogwheelFactory,
+  ToolFactory,
+  CharcoalBurner,
+  Laboratory,
+  FoodFactory,
+  CrystalLoadingstation
 }

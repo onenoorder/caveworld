@@ -42,6 +42,7 @@ class World {
     this.clock = new THREE.Clock();
 
     let mainHouse = new MainHouse(new Vector3(Math.floor(MapService.Instance.width / 2) - 3, Math.floor(MapService.Instance.height / 2) - 3, 0));
+    MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(-12)), 4, 9);
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(-3)), mainHouse.height, mainHouse.width + 6);
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(6)), 1, 3);
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(9)), 2, 8);
