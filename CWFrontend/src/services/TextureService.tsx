@@ -1,4 +1,5 @@
 import { Texture, TextureLoader } from 'three';
+import { DwarfKind } from '_utilities/Enums';
 
 class TextureService {
   textures: Map<string, Texture>;
@@ -8,6 +9,18 @@ class TextureService {
   excavationMaskTexturePrefix: string = 'excavation/ExcavationMask';
   scaffoldTexturePrefix: string = 'construction/Scaffold';
   dwarfsMap: string = 'dwarf/';
+  dwarfsKinds: DwarfKind[] = [DwarfKind.BLUE, DwarfKind.GREEN, DwarfKind.RED];
+  dwarfsAnimations: { name: string, frames: number }[] = [
+    { name: 'Climb', frames: 4 },
+    { name: 'DigDown', frames: 21 },
+    { name: 'DigLeft', frames: 15 },
+    { name: 'DigRight', frames: 15 },
+    { name: 'DigUp', frames: 20 },
+    { name: 'Idle', frames: 5 },
+    { name: 'Turn', frames: 12 },
+    { name: 'WalkLeft', frames: 12 },
+    { name: 'WalkRight', frames: 12 }
+  ];
 
   public static Instance: TextureService;
 
@@ -20,7 +33,18 @@ class TextureService {
     if (TextureService.Instance)
       TextureService.Instance.Destroy();
 
-      TextureService.Instance = new TextureService();
+    TextureService.Instance = new TextureService();
+    TextureService.Instance.PreloadDwarfTextures();
+  }
+
+  PreloadDwarfTextures() {
+    this.dwarfsKinds.forEach(kind => {
+      this.dwarfsAnimations.forEach(animation => {
+        for (let frame = 0; frame < animation.frames; frame++) {
+          this.GetDwarfTexture(kind, animation.name, frame);
+        }
+      });
+    });
   }
 
   GetTexture(name: string): Texture {
