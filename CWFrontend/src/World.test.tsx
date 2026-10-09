@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import World from './World';
-import { EntityService } from '_services/index';
+import { EntityService, MapService, PlacementService } from '_services/index';
 import { IEntity } from '_entities/index';
 
 const HIGHLIGHT_COLOR = 0x3a6a8a; // quarry-blue per Style Guide
@@ -28,6 +28,8 @@ function makeWorld(selectedCell: Vector3, isMouseOver: boolean) {
   (world as any).selectedEntityOriginalColor = null;
   (world as any).userInput = {
     selectedCell,
+    movement: new Vector3(0, 0, 0),
+    cameraSpeedAtZoomLevel: 1,
     mouse: { isMouseOver },
   };
   return world;
@@ -132,6 +134,32 @@ describe('World hover highlight (CAV-002)', () => {
   });
 
   describe('UC-10: hover detection is read-only toward positions and game logic', () => {
+    it('runs from the tick loop after placement and before entity ticking', () => {
+      const entity = makeEntity(5, 5, 0xffff00);
+      service.buildings = [entity] as any;
+      const world = makeWorld(new Vector3(5, 5, 0), true) as any;
+      world.clock = { getDelta: () => 0.016 };
+      world.camera = { position: new Vector3() };
+      world.spawnService = { Tick: jest.fn() };
+      const mapTick = jest.fn();
+      const placementSetPosition = jest.fn();
+      const entityTick = jest.fn();
+      (MapService as any).Instance = { Tick: mapTick };
+      (PlacementService as any).Instance = { SetPosition: placementSetPosition };
+      EntityService.Instance.Tick = entityTick;
+      const updateHoverSpy = jest.spyOn(world, 'updateHover');
+
+      World.prototype.tick.call(world);
+
+      expect(placementSetPosition).toHaveBeenCalledWith(world.userInput.selectedCell);
+      expect(updateHoverSpy).toHaveBeenCalledTimes(1);
+      expect(entityTick).toHaveBeenCalled();
+      expect(mapTick).toHaveBeenCalled();
+      // Hover outcome flows through the real updateHover: entity is highlighted.
+      expect((entity.object.material as MeshBasicMaterial).color.getHex()).toBe(HIGHLIGHT_COLOR);
+      expect(world.selectedEntity).toBe(entity);
+    });
+
     it('does not modify entity positions', () => {
       const entity = makeEntity(5, 5, 0xffff00);
       service.buildings = [entity] as any;

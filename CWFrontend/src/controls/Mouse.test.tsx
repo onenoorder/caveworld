@@ -97,6 +97,20 @@ describe('Mouse hover state (CAV-002)', () => {
     expect(mouse.moveMovement.y).toBe(0);
   });
 
+  it('MouseMove reuses a pending border-scroll timer instead of stacking timeouts', () => {
+    const { mouse, listeners } = makeMouse();
+
+    listeners['mousemove']({ clientX: 50, clientY: 550 });
+    const firstTimeout = mouse.borderScrollingTimeout;
+    listeners['mousemove']({ clientX: 750, clientY: 300 });
+
+    expect(mouse.borderScrollingTimeout).toBe(firstTimeout);
+    expect(mouse.borderScrollingTimeout).not.toBeNull();
+
+    jest.advanceTimersByTime(750);
+    expect(mouse.movement.x).toBe(mouse.cameraSpeed);
+  });
+
   it('MouseLeave clears the hover flag and pending movement', () => {
     const { mouse, listeners, movement } = makeMouse();
 
