@@ -6,7 +6,7 @@ import { IBuilding } from '_buildings/index';
 import { IConstruction } from '_constructions/index';
 import { IJob } from '_jobs/index';
 import { ConstructionFactory } from '_factories/ConstructionFactory';
-import { Scaffold, Stair } from '_entities/index';
+import { IEntity, Scaffold, Stair } from '_entities/index';
 
 class EntityService {
   scene: THREE.Scene;
@@ -109,6 +109,30 @@ class EntityService {
     });
 
     return false;
+  }
+
+  GetEntityAtPosition(position: THREE.Vector3): IEntity | null {
+    let entity: IEntity | null = null;
+
+    for (let index = 0; index < this.buildings.length; index++) {
+      entity = this.buildings[index];
+      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
+        return entity;
+    }
+
+    for (let index = 0; index < this.dwarfs.length; index++) {
+      entity = this.dwarfs[index];
+      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
+        return entity;
+    }
+
+    for (let index = 0; index < this.stairs.length; index++) {
+      entity = this.stairs[index];
+      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
+        return entity;
+    }
+
+    return null;
   }
 
   Destroy() {

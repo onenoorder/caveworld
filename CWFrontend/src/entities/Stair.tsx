@@ -5,6 +5,8 @@ import { IWithTextureService } from '_entities/index';
 class Stair implements IWithTextureService {
 	position: Vector3;
 	object: Mesh<BufferGeometry, Material | Material[]>;
+  height: number = 1;
+  width: number = 1;
   state: number = 0;
   buildProgress: number = 0;
 	name: string = 'Stair';

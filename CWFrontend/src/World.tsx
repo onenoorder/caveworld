@@ -5,6 +5,9 @@ import { TextureService, EntityService, SpawnService, MapService, PlacementServi
 import { UserInput } from '_controls/index';
 import { MainHouse } from '_houses/index';
 
+// Quarry-blue (#3a6a8a) — "Selection highlight" per Style Guide.
+const HIGHLIGHT_COLOR = 0x3a6a8a;
+
 class World {
   container: any;
   renderer: THREE.WebGLRenderer;
@@ -14,6 +17,7 @@ class World {
   userInput: UserInput;
   spawnService: SpawnService;
   selectedEntity: IEntity | null;
+  selectedEntityOriginalColor: THREE.Color | null;
 
   constructor(container: any) {
     this.container = container;
@@ -47,7 +51,8 @@ class World {
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(6)), 1, 3);
     MapService.Instance.Free(mainHouse.position.clone().add(new Vector3(9)), 2, 8);
 
-    this.selectedEntity = mainHouse;
+    this.selectedEntity = null;
+    this.selectedEntityOriginalColor = null;
     EntityService.Instance.TryAddBuilding(mainHouse);
 
     this.spawnService = new SpawnService(mainHouse.GetDoorPosition());
@@ -79,6 +84,8 @@ class World {
     MapService.Instance.Tick(delta);
     PlacementService.Instance.SetPosition(this.userInput.selectedCell);
 
+    this.updateHover();
+
     EntityService.Instance.Tick(delta);
     this.spawnService.Tick(delta);
 
@@ -86,6 +93,38 @@ class World {
     this.camera.position.y += this.userInput.movement.y * this.userInput.cameraSpeedAtZoomLevel * delta;
     this.camera.position.z += this.userInput.movement.z;
     this.userInput.movement.z = 0;
+  }
+
+  updateHover() {
+    if (!this.userInput.mouse.isMouseOver) {
+      this.clearHover();
+      return;
+    }
+
+    const entity = EntityService.Instance.GetEntityAtPosition(this.userInput.selectedCell);
+
+    if (entity === this.selectedEntity)
+      return;
+
+    this.clearHover();
+
+    if (entity) {
+      this.selectedEntityOriginalColor = this.getMaterial(entity).color.clone();
+      this.getMaterial(entity).color.setHex(HIGHLIGHT_COLOR);
+      this.selectedEntity = entity;
+    }
+  }
+
+  clearHover() {
+    if (this.selectedEntity) {
+      this.getMaterial(this.selectedEntity).color.copy(this.selectedEntityOriginalColor as THREE.Color);
+      this.selectedEntityOriginalColor = null;
+      this.selectedEntity = null;
+    }
+  }
+
+  getMaterial(entity: IEntity): THREE.MeshBasicMaterial {
+    return entity.object.material as THREE.MeshBasicMaterial;
   }
 
   render() {
