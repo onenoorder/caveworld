@@ -48,8 +48,8 @@ class TextureService {
   }
 
   GetTexture(name: string): Texture {
-    if (this.IsLoaded(name)) {
-      return this.textures.get(name) || new Texture();
+    if (this.textures.has(name)) {
+      return this.textures.get(name) as Texture;
     } else {
       this.loaded.set(name, false);
       let texture = new TextureLoader().load(this.texturesMap + name + '.png', () => {
