@@ -31,6 +31,28 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "testMatch": [
+      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/*.{spec,test}.{js,jsx,ts,tsx}"
+    ],
+    "moduleNameMapper": {
+      "^_controls/(.*)$": "<rootDir>/src/controls/$1",
+      "^_utilities/(.*)$": "<rootDir>/src/utilities/$1",
+      "^_services/(.*)$": "<rootDir>/src/services/$1",
+      "^_entities/(.*)$": "<rootDir>/src/entities/$1",
+      "^_buildings/(.*)$": "<rootDir>/src/entities/buildings/$1",
+      "^_houses/(.*)$": "<rootDir>/src/entities/buildings/houses/$1",
+      "^_storages/(.*)$": "<rootDir>/src/entities/buildings/storages/$1",
+      "^_dwarfs/(.*)$": "<rootDir>/src/entities/dwarfs/$1",
+      "^_constructions/(.*)$": "<rootDir>/src/entities/constructions/$1",
+      "^_jobs/(.*)$": "<rootDir>/src/jobs/$1",
+      "^_tasks/(.*)$": "<rootDir>/src/tasks/$1",
+      "^_factories/(.*)$": "<rootDir>/src/factories/$1",
+      "^_behaviors/(.*)$": "<rootDir>/src/behaviors/$1",
+      "^_goals/(.*)$": "<rootDir>/src/goals/$1"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
