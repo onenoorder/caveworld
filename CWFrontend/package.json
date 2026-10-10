@@ -31,11 +31,34 @@
       "react-app/jest"
     ]
   },
-  "jest": {
+    "jest": {
     "testMatch": [
       "**/__tests__/**/*.{js,jsx,ts,tsx}",
       "**/*.{spec,test}.{js,jsx,ts,tsx}"
     ],
+    "collectCoverageFrom": [
+      "src/World.tsx",
+      "src/services/EntityService.tsx",
+      "src/controls/Mouse.tsx"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 12,
+        "functions": 18
+      },
+      "./src/World.tsx": {
+        "lines": 100,
+        "functions": 100
+      },
+      "./src/services/EntityService.tsx": {
+        "lines": 100,
+        "functions": 100
+      },
+      "./src/controls/Mouse.tsx": {
+        "lines": 100,
+        "functions": 100
+      }
+    },
     "moduleNameMapper": {
       "^_controls/(.*)$": "<rootDir>/src/controls/$1",
       "^_utilities/(.*)$": "<rootDir>/src/utilities/$1",

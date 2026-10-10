@@ -16,7 +16,11 @@ class InteractiontService {
     this.run = true;
   }
 
-  public static Setup(scene: THREE.Scene) {
+    public static Setup(scene: THREE.Scene) {
+    if (InteractiontService.Instance)
+      InteractiontService.Instance.Destroy();
+
+    InteractiontService.Instance = new InteractiontService(scene);
   }
 
   Destroy() {
