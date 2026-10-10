@@ -2,7 +2,7 @@ import { Vector3 } from 'three';
 import { IDwarf } from '_entities/dwarfs/index';
 import { Goal } from '_goals/index';
 import { Scaffold } from '_entities/index';
-import { EntityService } from '_services/index';
+import { ScaffoldService } from '_services/index';
 
 export class DeconstructScaffoldGoal extends Goal {
   lastAction: number = 0;
@@ -24,7 +24,7 @@ export class DeconstructScaffoldGoal extends Goal {
     if (this.lastAction > 0.2) {
       this.state += Math.floor(this.lastAction / 0.1);
       if (this.state > 4) {
-        EntityService.Instance.RemoveScaffold(this.scaffold);
+        ScaffoldService.Instance.RemoveScaffold(this.scaffold);
         this.completed = true;
       }
     

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { JobService, MapService } from '_services/index';
+import { JobService, MapService, ScaffoldService } from '_services/index';
 import { IHouse } from '_houses/index';
 import { IDwarf } from '_dwarfs/index';
 import { IBuilding } from '_buildings/index';
@@ -72,12 +72,12 @@ class EntityService {
 		}
   }
 
-  AddScaffold(scaffold: Scaffold) {
-    this.scene.add(scaffold.BuildObject());
+    AddScaffold(scaffold: Scaffold) {
+    ScaffoldService.Instance.AddScaffold(scaffold);
   }
 
   RemoveScaffold(scaffold: Scaffold) {
-    this.scene.remove(scaffold.object);
+    ScaffoldService.Instance.RemoveScaffold(scaffold);
   }
 
   IsHouse(building: IBuilding): boolean {
@@ -101,14 +101,10 @@ class EntityService {
     MapService.Instance.SetClimbable(stair.position);
   }
 
-  HasStair(position: THREE.Vector3) : Boolean {
-    this.stairs.forEach((stair) => {
-      if (stair.position.x === position.x && stair.position.y === position.y) {
-        return true;
-      }
+    HasStair(position: THREE.Vector3) : Boolean {
+    return this.stairs.some((stair) => {
+      return stair.position.x === position.x && stair.position.y === position.y;
     });
-
-    return false;
   }
 
   GetEntityAtPosition(position: THREE.Vector3): IEntity | null {
