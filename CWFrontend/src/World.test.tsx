@@ -108,7 +108,7 @@ describe('World (CAV-002)', () => {
     it('destroy tears down services and the renderer exactly once per resource', () => {
       // Arrange
       const { world, renderer } = makeWorld();
-      EntityService.Instance.AddDwarf(makeEntity(1, 1, 0xffffff));
+      EntityService.Instance.AddDwarf(makeEntity(1, 1, 0xffffff) as unknown as Parameters<typeof EntityService.Instance.AddDwarf>[0]);
 
       // Act
       world.destroy();

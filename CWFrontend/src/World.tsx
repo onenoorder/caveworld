@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { IEntity } from 'entities';
+import { IEntity, Stair } from 'entities';
 import WorldRuntime from './WorldRuntime';
 import { TextureService, EntityService, SpawnService, MapService, PlacementService, JobService, InteractiontService } from '_services/index';
+import { RedDwarf } from '_dwarfs/index';
 import { UserInput } from '_controls/index';
 
 // Quarry-blue (#3a6a8a) — "Selection highlight" per Style Guide.
@@ -46,10 +47,38 @@ class World {
     this.camera.position.y = this.runtime.mainHouse.position.y + 3;
     this.camera.position.z = 10;
 
-    // E2E/debug hook: exposes the live simulation so Cypress specs can assert
-    // mesh/material state (Three.js draws into an opaque canvas, invisible to
-    // the DOM). Read-only from the tests' point of view.
-    (window as any).__cw = { world: this };
+    // E2E/debug hook: exposes the live simulation and the app-bundle service
+    // singletons so Cypress specs can assert mesh/material state (Three.js
+    // draws into an opaque canvas, invisible to the DOM) without a second
+    // module graph. Read-only from the tests' point of view, plus two seed
+    // helpers for entities the early game cannot create from the toolbar yet.
+    (window as any).__cw = {
+      world: this,
+      services: { EntityService, MapService, PlacementService },
+      helpers: {
+        // Projected screen (client) position of a grid cell centre, resolved
+        // through the live camera — Cypress hovers with document coordinates.
+        worldToScreen: (x: number, y: number) => {
+          const projected = new THREE.Vector3(x + 0.5, y + 0.5, 0).project(this.camera);
+          const canvas = this.renderer.domElement;
+          const rect = canvas.getBoundingClientRect();
+          return {
+            x: rect.left + ((projected.x + 1) / 2) * rect.width,
+            y: rect.top + ((1 - projected.y) / 2) * rect.height,
+          };
+        },
+        addDwarf: (x: number, y: number) => {
+          const dwarf = new RedDwarf(new Vector3(x, y, 0), this.runtime.mainHouse);
+          EntityService.Instance.AddDwarf(dwarf);
+          return dwarf;
+        },
+        addStair: (x: number, y: number) => {
+          const stair = new Stair(new Vector3(x, y, 0));
+          EntityService.Instance.AddStair(stair);
+          return stair;
+        },
+      },
+    };
   }
 
   destroy() {

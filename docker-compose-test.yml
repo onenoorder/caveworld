@@ -1,0 +1,40 @@
+version: "3.8"
+
+# Cypress integration test stack (Quality & Test Strategy):
+#   docker compose -f docker-compose-test.yml up --build --abort-on-container-exit
+# Builds the SPA, serves it via nginx, and runs the cypress/e2e specs headlessly
+# against it with the preinstalled Cypress binary from cypress/included.
+services:
+  nginx:
+    build:
+      context: ./CWFrontend
+      dockerfile: docker/test.Dockerfile
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  e2e:
+    image: cypress/included:13.15.0
+    depends_on:
+      nginx:
+        condition: service_healthy
+    working_dir: /e2e
+    volumes:
+      - ./CWFrontend:/e2e
+    environment:
+      CYPRESS_baseUrl: http://nginx:80
+    shm_size: '512m'
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
