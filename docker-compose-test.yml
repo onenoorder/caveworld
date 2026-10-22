@@ -12,7 +12,8 @@ services:
     expose:
       - "80"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      # nginx ships curl but not wget; fail until the SPA answers on /.
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ >/dev/null || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 12
@@ -24,6 +25,10 @@ services:
 
   e2e:
     image: cypress/included:13.15.0
+    # The included image sets an ENTRYPOINT; neutralise it so `command` is the
+    # full invocation (deterministic across image versions).
+    entrypoint: []
+    init: true
     depends_on:
       nginx:
         condition: service_healthy
@@ -33,6 +38,7 @@ services:
     environment:
       CYPRESS_baseUrl: http://nginx:80
     shm_size: '512m'
+    command: cypress run
     deploy:
       resources:
         limits:

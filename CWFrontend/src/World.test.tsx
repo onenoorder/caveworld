@@ -45,7 +45,14 @@ function setupWorldServices(): { sceneAdds: any[]; sceneRemoves: any[]; mapFree:
     SetClimbable: jest.fn(),
     Destroy: jest.fn(),
   };
-  (TextureService as any).Instance = { Destroy: jest.fn() };
+  (TextureService as any).Instance = {
+    Destroy: jest.fn(),
+    GetTexture: jest.fn(() => ({ dispose: jest.fn() })),
+    GetBuildingTexture: jest.fn(() => ({ dispose: jest.fn() })),
+    GetBuildingTextureWithState: jest.fn(() => ({ dispose: jest.fn() })),
+    GetScaffoldTexture: jest.fn(() => ({ dispose: jest.fn() })),
+    GetDwarfTexture: jest.fn(() => ({ dispose: jest.fn() })),
+  };
   (InteractiontService as any).Instance = { Destroy: jest.fn() };
   (JobService as any).Setup();
   (PlacementService as any).Instance = { Destroy: jest.fn(), SetPosition: jest.fn() };
@@ -56,7 +63,10 @@ function setupWorldServices(): { sceneAdds: any[]; sceneRemoves: any[]; mapFree:
   EntityService.Setup(scene as any);
 
   const renderer = {
-    domElement: { addEventListener: jest.fn() },
+    domElement: {
+      addEventListener: jest.fn(),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0, width: 800, height: 600 })),
+    },
     clear: jest.fn(),
     dispose: jest.fn(),
     setAnimationLoop: jest.fn(),
@@ -140,6 +150,92 @@ describe('World (CAV-002)', () => {
       expect(EntityService.Instance.Tick).toHaveBeenCalled();
       expect(renderer.render).toHaveBeenCalledWith(world.scene, world.camera);
       expect(renderer.setAnimationLoop).toHaveBeenLastCalledWith(null);
+    });
+  });
+
+  describe('__cw debug hook (E2E support, unit-covered)', () => {
+    it('exposes the container, the app-bundle service singletons and the world', () => {
+      // Arrange + Act
+      const container = { offsetWidth: 800, offsetHeight: 600, append: jest.fn(), addEventListener: jest.fn(), removeEventListener: jest.fn() };
+      const setup = setupWorldServices();
+      const world = new World(container);
+
+      // Assert — same module graph as the app bundle (no spec-side re-import).
+      const hook = (window as any).__cw;
+      expect(hook.world).toBe(world);
+      expect(hook.container).toBe(container);
+      expect(hook.services.EntityService).toBe(EntityService);
+      expect(hook.services.MapService).toBe(MapService);
+      expect(hook.services.PlacementService).toBe(PlacementService);
+    });
+
+    it('worldToScreen projects cell centres through the camera onto the canvas rect', () => {
+      // Arrange — boot places the camera at house (100,60) + 3 => (103,63),
+      // looking straight down; the canvas rect double is 800x600 at (0,0).
+      const { world } = makeWorld();
+      const hook = (window as any).__cw;
+
+      // Act — cell (102,62) has its centre at (102.5,62.5), half a cell
+      // down-left of the camera; its exact mirror is cell (103,63).
+      const belowLeft = hook.helpers.worldToScreen(102, 62);
+      const aboveRight = hook.helpers.worldToScreen(103, 63);
+
+      // Assert — mirrored points map to mirrored pixels across the centre
+      // (400,300); the down-left cell lands in the lower-left quadrant.
+      expect(belowLeft.x).toBeLessThan(400);
+      expect(belowLeft.y).toBeGreaterThan(300);
+      expect(aboveRight.x).toBeGreaterThan(400);
+      expect(aboveRight.y).toBeLessThan(300);
+      expect(belowLeft.x + aboveRight.x).toBeCloseTo(800, 0);
+      expect(belowLeft.y + aboveRight.y).toBeCloseTo(600, 0);
+      expect(world.camera).toBeDefined();
+    });
+
+    it('worldToScreen stays within the canvas for on-screen cells', () => {
+      // Arrange
+      makeWorld();
+      const hook = (window as any).__cw;
+
+      // Act — a few cells around the camera position (all in view).
+      const points = [hook.helpers.worldToScreen(100, 60), hook.helpers.worldToScreen(106, 66), hook.helpers.worldToScreen(102, 62)];
+
+      // Assert
+      for (const p of points) {
+        expect(p.x).toBeGreaterThanOrEqual(0);
+        expect(p.x).toBeLessThanOrEqual(800);
+        expect(p.y).toBeGreaterThanOrEqual(0);
+        expect(p.y).toBeLessThanOrEqual(600);
+      }
+    });
+
+    it('addDwarf registers a dwarf at the requested cell via the real service', () => {
+      // Arrange
+      const { sceneAdds } = makeWorld();
+      const hook = (window as any).__cw;
+
+      // Act
+      const dwarf = hook.helpers.addDwarf(30, 20);
+
+      // Assert
+      expect(EntityService.Instance.dwarfs).toContain(dwarf);
+      expect(sceneAdds).toContain(dwarf.object);
+      expect(dwarf.position.x).toBe(30);
+      expect(dwarf.position.y).toBe(20);
+    });
+
+    it('addStair registers a stair at the requested cell via the real service', () => {
+      // Arrange
+      const { sceneAdds } = makeWorld();
+      const hook = (window as any).__cw;
+
+      // Act
+      const stair = hook.helpers.addStair(12, 8);
+
+      // Assert
+      expect(EntityService.Instance.stairs).toContain(stair);
+      expect(sceneAdds).toContain(stair.object);
+      expect((MapService as any).Instance.Build).toHaveBeenCalledWith(stair.position, 1, 1);
+      expect((MapService as any).Instance.SetClimbable).toHaveBeenCalledWith(stair.position);
     });
   });
 

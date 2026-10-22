@@ -1,0 +1,9 @@
+# Keep the Docker build context lean and OS-clean: the local node_modules
+# (Windows binaries + jest/cypress dev tooling) must never leak into the
+# Linux images — test.Dockerfile runs its own `npm ci` from the lockfile.
+node_modules
+build
+coverage
+cypress/videos
+cypress/screenshots
+.git

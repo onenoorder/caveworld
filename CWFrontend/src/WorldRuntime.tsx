@@ -42,6 +42,10 @@ class WorldRuntime {
     MapService.Instance.Free(this.mainHouse.position.clone().add(new Vector3(-3)), this.mainHouse.height, this.mainHouse.width + 6);
     MapService.Instance.Free(this.mainHouse.position.clone().add(new Vector3(6)), 1, 3);
     MapService.Instance.Free(this.mainHouse.position.clone().add(new Vector3(9)), 2, 8);
+
+    // Register + render the main house so it is part of the entity registries
+    // (buildings/houses) and the hover lookup, as on master.
+    EntityService.Instance.TryAddBuilding(this.mainHouse);
   }
 }
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { IEntity, Stair } from 'entities';
+import { IEntity, Stair } from '_entities/index';
 import WorldRuntime from './WorldRuntime';
 import { TextureService, EntityService, SpawnService, MapService, PlacementService, JobService, InteractiontService } from '_services/index';
 import { RedDwarf } from '_dwarfs/index';
@@ -54,11 +54,17 @@ class World {
     // helpers for entities the early game cannot create from the toolbar yet.
     (window as any).__cw = {
       world: this,
+      container: this.container,
       services: { EntityService, MapService, PlacementService },
       helpers: {
         // Projected screen (client) position of a grid cell centre, resolved
         // through the live camera — Cypress hovers with document coordinates.
         worldToScreen: (x: number, y: number) => {
+          // Project needs up-to-date world/projection matrices; the render
+          // loop refreshes them, but a caller between frames (e.g. a spec
+          // right after seeding entities) must not see stale matrices.
+          this.camera.updateMatrixWorld();
+          this.camera.updateProjectionMatrix();
           const projected = new THREE.Vector3(x + 0.5, y + 0.5, 0).project(this.camera);
           const canvas = this.renderer.domElement;
           const rect = canvas.getBoundingClientRect();
