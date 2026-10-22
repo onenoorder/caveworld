@@ -35,8 +35,11 @@ export function leaveCanvas(): void {
   cy.get('div[style*="width: 80%"]').trigger('mouseleave', { eventConstructor: 'MouseEvent' });
 }
 
+// The game applies hover state on its next animation frame (updateHover runs in
+// tick), so these assertions retry until the frame has processed the input —
+// `.should` with a callback re-runs it on Cypress' default command timeout.
 export function expectHighlighted(entity: unknown): void {
-  cy.window().then((win: any) => {
+  cy.window().should((win: any) => {
     const color = (entity as any).object.material.color;
     expect(color.getHex(), 'entity is quarry-blue highlighted').to.eq(0x3a6a8a);
     expect(win.__cw.world.selectedEntity, 'world tracks the hovered entity').to.eq(entity);
@@ -44,7 +47,7 @@ export function expectHighlighted(entity: unknown): void {
 }
 
 export function expectReverted(entity: unknown, originalColor: number): void {
-  cy.window().then((win: any) => {
+  cy.window().should((win: any) => {
     const color = (entity as any).object.material.color;
     expect(color.getHex(), 'entity reverted to its original color').to.eq(originalColor);
     expect(win.__cw.world.selectedEntity, 'world no longer tracks an entity').to.be.null;

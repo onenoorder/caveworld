@@ -1,11 +1,13 @@
 import { hoverCell, leaveCanvas, expectHighlighted, expectReverted, entityAt } from '../support/e2e';
 
 // MainHouse is placed at map centre by the boot sequence: (240/2 - 3, 135/2 - 3)
-// = (117, 64). Its mesh color is the story's documented 0xffff00 building base.
+// = (117, 64). Its material is a white tint over the building texture — the
+// "original color" revert target is MeshBasicMaterial's default white.
 const HOUSE_X = 117;
 const HOUSE_Y = 64;
-const HOUSE_BASE_COLOR = 0xffff00;
-const EMPTY_CELL = { x: 5, y: 5 };
+const HOUSE_BASE_COLOR = 0xffffff;
+// On-screen empty ground clear of the house footprint (117..120 x 64..66).
+const EMPTY_CELL = { x: HOUSE_X + 5, y: HOUSE_Y + 5 };
 
 // IT-1: Hover over building → blue highlight; move away → revert (P0, AC-1, AC-4)
 describe('IT-1: hovering a building highlights it and moving away reverts it', () => {
@@ -18,13 +20,13 @@ describe('IT-1: hovering a building highlights it and moving away reverts it', (
     // Act: hover the house cell, then move to empty space.
     hoverCell(HOUSE_X, HOUSE_Y);
 
-    // Assert: highlighted while hovered.
+    // Assert: highlighted while hovered (retries until the game frame applies it).
     entityAt(HOUSE_X, HOUSE_Y).then((house) => expectHighlighted(house));
 
     // Act: move away to an empty cell.
     hoverCell(EMPTY_CELL.x, EMPTY_CELL.y);
 
-    // Assert: reverted to the original building color.
+    // Assert: reverted to the original building tint.
     entityAt(HOUSE_X, HOUSE_Y).then((house) => expectReverted(house, HOUSE_BASE_COLOR));
   });
 });
@@ -84,7 +86,7 @@ describe('IT-6: placement keeps working while hover highlighting is active', () 
     cy.get('img[alt="TinyHouse"]').click();
 
     // Assert: placement pipeline was invoked; hover state intact.
-    cy.window().then((win: any) => {
+    cy.window().should((win: any) => {
       expect(win.__cw.services.PlacementService.Instance.PlaceBuilding).to.have.been.called;
       expect(win.__cw.world.selectedEntity).to.eq(win.__cw.services.EntityService.Instance.GetEntityAtPosition({ x: HOUSE_X, y: HOUSE_Y, z: 0 }));
     });

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { IEntity, Stair } from '_entities/index';
 import WorldRuntime from './WorldRuntime';
-import { TextureService, EntityService, SpawnService, MapService, PlacementService, JobService, InteractiontService } from '_services/index';
+import { TextureService, EntityService, SpawnService, MapService, PlacementService, InteractiontService } from '_services/index';
 import { RedDwarf } from '_dwarfs/index';
 import { UserInput } from '_controls/index';
 
