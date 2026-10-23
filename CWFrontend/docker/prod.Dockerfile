@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:22-alpine3.19 as build
+FROM node:22-alpine3.24 as build
 
 # set working directory
 WORKDIR ../
@@ -19,7 +19,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginx:1.27.2
+FROM nginx:1.31.8
 COPY --from=build /build /usr/share/nginx/html
 # new
 COPY nginx-prod.conf /etc/nginx/conf.d/default.conf
