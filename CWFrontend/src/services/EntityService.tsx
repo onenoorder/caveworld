@@ -107,25 +107,40 @@ class EntityService {
     });
   }
 
-  GetEntityAtPosition(position: THREE.Vector3): IEntity | null {
-    let entity: IEntity | null = null;
+    GetEntityAtPosition(position: THREE.Vector3): IEntity | null {
+    const cellX = Math.floor(position.x);
+    const cellY = Math.floor(position.y);
 
-    for (let index = 0; index < this.buildings.length; index++) {
-      entity = this.buildings[index];
-      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
-        return entity;
-    }
-
+    // Dwarfs are resolved first: they render in front of every other entity
+    // (renderOrder 999, depthTest disabled), so when a dwarf stands in front
+    // of a building the cursor must target the dwarf, not the building whose
+    // footprint also covers the cell.
     for (let index = 0; index < this.dwarfs.length; index++) {
-      entity = this.dwarfs[index];
-      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
-        return entity;
+      // Dwarfs move on fractional positions while their sprite spans exactly
+      // one cell around its centre ([p, p+1]). Math.round resolves the cell
+      // holding the majority of the sprite (the cell the dwarf is visually
+      // "on"), so the hitbox tracks the visible dwarf instead of lagging one
+      // cell behind whenever the fractional part passes 0.5.
+      if (Math.round(this.dwarfs[index].position.x) === cellX &&
+          Math.round(this.dwarfs[index].position.y) === cellY)
+        return this.dwarfs[index];
     }
 
     for (let index = 0; index < this.stairs.length; index++) {
-      entity = this.stairs[index];
-      if (Math.floor(entity.position.x) === position.x && Math.floor(entity.position.y) === position.y)
-        return entity;
+      if (Math.floor(this.stairs[index].position.x) === cellX && Math.floor(this.stairs[index].position.y) === cellY)
+        return this.stairs[index];
+    }
+
+    // Buildings are selectable across their whole footprint, not just their
+    // origin cell: cells [x, x + width) x [y, y + height) — the same
+    // convention MapService.Build uses to mark the grid.
+    for (let index = 0; index < this.buildings.length; index++) {
+      const building = this.buildings[index];
+      if (cellX >= Math.floor(building.position.x) &&
+          cellX < Math.floor(building.position.x) + building.width &&
+          cellY >= Math.floor(building.position.y) &&
+          cellY < Math.floor(building.position.y) + building.height)
+        return building;
     }
 
     return null;

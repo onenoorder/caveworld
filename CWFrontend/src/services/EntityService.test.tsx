@@ -85,9 +85,10 @@ describe('EntityService (CAV-002)', () => {
       expect(service.GetEntityAtPosition(new Vector3(30, 15, 0))).toBe(stair);
     });
 
-    it('floors fractional entity coordinates before comparing', () => {
-      // Arrange
-      const dwarf = new RedDwarf(new Vector3(7.4, 3.9, 0), null);
+        it('quantizes fractional dwarf coordinates to the visually occupied cell', () => {
+      // Arrange — dwarf sprite spans [7.4, 8.4] x [3.4, 4.4]; round resolves
+      // each axis to the cell holding the majority of the sprite.
+      const dwarf = new RedDwarf(new Vector3(7.4, 3.4, 0), null);
       service.dwarfs.push(dwarf);
 
       // Act
@@ -105,15 +106,15 @@ describe('EntityService (CAV-002)', () => {
       expect(service.GetEntityAtPosition(new Vector3(0, 0, 0))).toBeNull();
     });
 
-    it('returns null on a boundary mismatch (x matches, y does not)', () => {
-      // Arrange
+        it('returns null on a boundary mismatch (x matches, y is outside the footprint)', () => {
+      // Arrange — MainHouse at (10,5) covers y = 5..7; y = 8 is above it.
       service.buildings.push(new MainHouse(new Vector3(10, 5, 0)));
 
       // Act + Assert
-      expect(service.GetEntityAtPosition(new Vector3(10, 6, 0))).toBeNull();
+      expect(service.GetEntityAtPosition(new Vector3(10, 8, 0))).toBeNull();
     });
 
-    it('returns the building when a building and a dwarf share a cell', () => {
+        it('returns the dwarf when a dwarf and a building share a cell (dwarfs render in front)', () => {
       // Arrange
       const house = new MainHouse(new Vector3(3, 4, 0));
       const dwarf = new RedDwarf(new Vector3(3, 4, 0), null);
@@ -124,10 +125,10 @@ describe('EntityService (CAV-002)', () => {
       const result = service.GetEntityAtPosition(new Vector3(3, 4, 0));
 
       // Assert
-      expect(result).toBe(house);
+      expect(result).toBe(dwarf);
     });
 
-    it('returns the dwarf when a dwarf and a stair share a cell', () => {
+        it('returns the dwarf when a dwarf and a stair share a cell', () => {
       // Arrange
       const dwarf = new RedDwarf(new Vector3(3, 4, 0), null);
       const stair = makeStair(3, 4);
@@ -136,6 +137,71 @@ describe('EntityService (CAV-002)', () => {
 
       // Act
       const result = service.GetEntityAtPosition(new Vector3(3, 4, 0));
+
+      // Assert
+      expect(result).toBe(dwarf);
+    });
+
+    it('returns the stair when a stair sits inside a building footprint', () => {
+      // Arrange
+      const house = new MainHouse(new Vector3(3, 4, 0));
+      service.TryAddBuilding(house);
+      const stair = makeStair(4, 5);
+      service.stairs.push(stair);
+
+      // Act
+      const result = service.GetEntityAtPosition(new Vector3(4, 5, 0));
+
+      // Assert
+      expect(result).toBe(stair);
+    });
+
+    it('matches a building across its whole footprint, not just its origin cell (regression)', () => {
+      // Arrange — MainHouse is 3 tall x 4 wide, covering cells (10..13, 5..7).
+      const house = new MainHouse(new Vector3(10, 5, 0));
+      service.TryAddBuilding(house);
+
+      // Act + Assert — every cell of the footprint resolves to the building.
+      for (let x = 10; x <= 13; x++) {
+        for (let y = 5; y <= 7; y++) {
+          expect(service.GetEntityAtPosition(new Vector3(x, y, 0))).toBe(house);
+        }
+      }
+    });
+
+    it('does not match a building outside its footprint', () => {
+      // Arrange — MainHouse covers (10..13, 5..7).
+      const house = new MainHouse(new Vector3(10, 5, 0));
+      service.TryAddBuilding(house);
+
+      // Act + Assert — cells just outside every edge are empty.
+      expect(service.GetEntityAtPosition(new Vector3(9, 5, 0))).toBeNull();
+      expect(service.GetEntityAtPosition(new Vector3(14, 5, 0))).toBeNull();
+      expect(service.GetEntityAtPosition(new Vector3(10, 4, 0))).toBeNull();
+      expect(service.GetEntityAtPosition(new Vector3(10, 8, 0))).toBeNull();
+    });
+
+    it('rounds fractional dwarf positions to the cell the dwarf is visually on (regression)', () => {
+      // Arrange — a dwarf walking across the boundary of two cells: the sprite
+      // spans [7.6, 8.6], so it is mostly on cell 8; floor would wrongly report 7.
+      const dwarf = new RedDwarf(new Vector3(7.6, 3.9, 0), null);
+      service.dwarfs.push(dwarf);
+
+      // Act + Assert
+      expect(service.GetEntityAtPosition(new Vector3(8, 4, 0))).toBe(dwarf);
+      expect(service.GetEntityAtPosition(new Vector3(7, 3, 0))).toBeNull();
+    });
+
+    it('resolves a dwarf standing in front of a building to the dwarf (regression)', () => {
+      // Arrange — the dwarf's cell is also covered by the house footprint;
+      // dwarfs render in front, so the dwarf must win the lookup.
+      const house = new MainHouse(new Vector3(10, 5, 0));
+      service.TryAddBuilding(house);
+      const dwarf = new RedDwarf(new Vector3(12, 6, 0), null);
+      service.dwarfs.push(dwarf);
+
+      // Act
+      const result = service.GetEntityAtPosition(new Vector3(12, 6, 0));
 
       // Assert
       expect(result).toBe(dwarf);
