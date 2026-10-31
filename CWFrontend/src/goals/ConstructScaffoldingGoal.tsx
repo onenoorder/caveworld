@@ -49,10 +49,10 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
       let cell = leftCorner.clone().add(new Vector3(x, 0, 0));
       steps.push(new FollowPathGoal(this.dwarf, this.CreateLeg(currentPosition, cell)));
 
+      steps.push(new ConstructScaffoldGoal(this.dwarf, cell, this.CalculateScaffoldNumber(x, 0), this.addScaffold));
+
       if (x === ladderX) {
         steps.push(new ConstructScaffoldGoal(this.dwarf, cell, this.CalculateScaffoldStairNumber(ladderX, 0), this.addScaffold));
-      } else {
-        steps.push(new ConstructScaffoldGoal(this.dwarf, cell, this.CalculateScaffoldNumber(x, 0), this.addScaffold));
       }
 
       currentPosition = cell;
@@ -72,7 +72,10 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
       currentPosition = ladderTop;
 
       // The stair of this floor, standing in the rightmost column.
-      steps.push(new ConstructScaffoldGoal(this.dwarf, ladderTop, this.CalculateScaffoldStairNumber(ladderX, y), this.addScaffold));
+      steps.push(new ConstructScaffoldGoal(this.dwarf, ladderTop, this.CalculateScaffoldNumber(ladderX, y), this.addScaffold));
+      if (y < this.building.height -1) {
+        steps.push(new ConstructScaffoldGoal(this.dwarf, ladderTop, this.CalculateScaffoldStairNumber(ladderX, y), this.addScaffold));
+      }
 
       // Place the remaining scaffolds of this floor from right to left,
       // walking to each cell first. The ladder cell is skipped because its
@@ -87,6 +90,8 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
         currentPosition = cell;
       }
     }
+
+    steps.push(new FollowPathGoal(this.dwarf, this.CreateLeg(currentPosition, this.building.GetRightCorner().clone())));
 
     // Push the steps in reverse so that the first step (walking to the left
     // corner of the build) executes first on the LIFO sub goal stack.

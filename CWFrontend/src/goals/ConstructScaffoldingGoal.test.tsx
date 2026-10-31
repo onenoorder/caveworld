@@ -179,9 +179,15 @@ describe('ConstructScaffoldingGoal', () => {
 
     expect(constructGoals[0].target.x).toBe(10);
     expect(constructGoals[0].target.y).toBe(10);
+
+    // The final walk takes the dwarf to the building's right corner.
+    let finalLeg = legGoals[legGoals.length - 1];
+    let finalLegTarget = finalLeg.path[finalLeg.path.length - 1].position;
+    expect(finalLegTarget.x).toBe(13);
+    expect(finalLegTarget.y).toBe(10);
   });
 
-  it('places exactly one stair scaffold per floor in the rightmost column, including the top floor', () => {
+  it('places stair scaffolds on the ground and intermediate floors, but not the top floor', () => {
     // Arrange
     placedScaffolds = [];
     let dwarf = CreateDwarf(new Vector3(20, 5, 0));
@@ -192,23 +198,29 @@ describe('ConstructScaffoldingGoal', () => {
     // Act
     let { constructGoals } = DrainSubGoals(goal);
 
-    // Assert — every floor has exactly one stair scaffold and no other scaffold
-    // occupies the ladder column, so the ladder is complete up to the top floor.
+    // Assert — the ground and intermediate floors place both a regular and
+    // stair scaffold in the ladder column; the top floor places only a regular
+    // scaffold there.
     let ladderX = 10 + 4 - 1;
-    for (let y = 10; y < 10 + 3; y++) {
+    let expectedScaffoldsPerFloor = [5, 5, 4];
+    let expectedLadderScaffoldsPerFloor = [2, 2, 1];
+    let expectedStairsPerFloor = [1, 1, 0];
+
+    for (let floor = 0; floor < 3; floor++) {
+      let y = 10 + floor;
       let scaffoldsOnFloor = constructGoals.filter(goal => goal.target.y === y);
       let ladderScaffolds = scaffoldsOnFloor.filter(goal => goal.target.x === ladderX);
       let stairScaffolds = ladderScaffolds.filter(goal => goal.scaffold.endNumber === 8 || goal.scaffold.endNumber === 9);
 
-      expect(scaffoldsOnFloor.length).toBe(4);
-      expect(ladderScaffolds.length).toBe(1);
-      expect(stairScaffolds.length).toBe(1);
+      expect(scaffoldsOnFloor.length).toBe(expectedScaffoldsPerFloor[floor]);
+      expect(ladderScaffolds.length).toBe(expectedLadderScaffoldsPerFloor[floor]);
+      expect(stairScaffolds.length).toBe(expectedStairsPerFloor[floor]);
     }
 
-    // The top floor (y = 12) must carry the stair too.
+    // The top floor (y = 12) has no stair scaffold.
     let topFloorScaffolds = constructGoals.filter(goal => goal.target.y === 12);
     let topFloorStairs = topFloorScaffolds.filter(goal => goal.scaffold.endNumber === 8 || goal.scaffold.endNumber === 9);
-    expect(topFloorStairs.length).toBe(1);
+    expect(topFloorStairs.length).toBe(0);
   });
 
   it('completes and registers every scaffold with EntityService when run tick by tick', () => {
@@ -223,6 +235,6 @@ describe('ConstructScaffoldingGoal', () => {
 
     // Assert
     expect(goal.completed).toBe(true);
-    expect(placedScaffolds.length).toBe(4 * 3);
+    expect(placedScaffolds.length).toBe(4 * 3 + 2);
   });
 });
