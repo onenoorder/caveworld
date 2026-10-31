@@ -1,3 +1,6 @@
+// expectReverted is intentionally NOT used in IT-5: its selectedEntity === null
+// assertion is wrong for an entity→entity switch (the correct tracked entity
+// after switching to the dwarf IS the dwarf). IT-1/IT-4 keep it.
 import { hoverCell, leaveCanvas, expectHighlighted, expectReverted, entityAt } from '../support/e2e';
 
 // MainHouse is placed at map centre by the boot sequence: (240/2 - 3, 135/2 - 3)
@@ -49,23 +52,65 @@ describe('IT-4: moving the mouse off the canvas clears all highlights', () => {
 });
 
 // IT-5: Hover from building to dwarf → building reverts, dwarf highlights (P1, AC-4, AC-5)
+//
+// Deterministic rewrite (validate-story 2026-10-31, blocker B1): the previous
+// version seeded a LIVE dwarf (world loop unfrozen) while the boot dwarf still
+// wandered, then misused expectReverted — whose second assertion demands
+// world.selectedEntity === null — for the intermediate building state. Both
+// assertions were races on dwarf wander: when the dwarf lingered on its cell
+// the null check failed; when it wandered off, entityAt returned null and
+// expectHighlighted dereferenced it. Neither outcome reflects a product
+// defect: with the dwarf deterministically on its cell, the correct state
+// after the switch IS selectedEntity === dwarf.
+//
+// This rewrite uses the pattern proven in hover-footprint.cy.ts: clear every
+// dwarf, park the spawner deep in the past, freeze the world loop while
+// seeding, and apply the hover state via one explicit world.tick() per
+// cursor move (hover is applied in World.tick()/updateHover()).
 describe('IT-5: moving from a building to a dwarf switches the highlight cleanly', () => {
   it('reverts the building and highlights the dwarf without leaving the canvas', () => {
     cy.visit('/');
 
-    // Arrange: seed a dwarf next to the house via the debug hook.
+    // Arrange: a dwarf at a fixed cell next to the house, with every other
+    // dwarf removed, the spawner parked, and the simulation loop frozen so
+    // nothing can move for the rest of the spec.
     const DWARF = { x: HOUSE_X + 10, y: HOUSE_Y };
+    let dwarf: any = null;
     cy.window().then((win: any) => {
-      win.__cw.helpers.addDwarf(DWARF.x, DWARF.y);
+      win.__cw.world.stop();
+      const service = win.__cw.services.EntityService.Instance;
+      service.dwarfs.forEach((d: any) => win.__cw.world.scene.remove(d.object));
+      service.dwarfs = [];
+      // Tick() spawns when status > 30; park it deep in the past.
+      win.__cw.world.spawnService.status = -1000000;
+      dwarf = win.__cw.helpers.addDwarf(DWARF.x, DWARF.y);
+    });
+    // Apply the hover state for the currently selected cell exactly once.
+    const tickHover = () => cy.window().then((win: any) => win.__cw.world.tick());
+
+    // Act: hover the house cell and apply exactly one frame.
+    hoverCell(HOUSE_X, HOUSE_Y);
+    tickHover();
+
+    // Assert: the house is highlighted while hovered.
+    cy.window().should((win: any) => {
+      expect((win.__cw.world.runtime.mainHouse.object.material as any).color.getHex()).to.eq(0x3a6a8a);
+      expect(win.__cw.world.selectedEntity).to.eq(win.__cw.world.runtime.mainHouse);
     });
 
-    // Act: hover the house, then move to the dwarf.
-    hoverCell(HOUSE_X, HOUSE_Y);
+    // Act: move directly to the dwarf cell (staying on the container — no
+    // mouseleave) and apply exactly one frame.
     hoverCell(DWARF.x, DWARF.y);
+    tickHover();
 
-    // Assert: building reverted, dwarf highlighted.
-    entityAt(HOUSE_X, HOUSE_Y).then((house) => expectReverted(house, HOUSE_BASE_COLOR));
-    entityAt(DWARF.x, DWARF.y).then((dwarf) => expectHighlighted(dwarf));
+    // Assert: the house reverted to its base tint AND the dwarf is
+    // highlighted and tracked — the deterministic switch the spec intends.
+    cy.window().should((win: any) => {
+      expect(dwarf, 'seeded dwarf present').to.not.be.null;
+      expect((win.__cw.world.runtime.mainHouse.object.material as any).color.getHex(), 'house reverted').to.eq(HOUSE_BASE_COLOR);
+      expect((dwarf.object.material as any).color.getHex(), 'dwarf is quarry-blue').to.eq(0x3a6a8a);
+      expect(win.__cw.world.selectedEntity, 'dwarf wins the cell after the switch').to.eq(dwarf);
+    });
   });
 });
 
