@@ -17,6 +17,7 @@ class Mouse {
 
     clientX: number = 0;
     clientY: number = 0;
+    isMouseOver: boolean = false;
 
     constructor(container: any, camera: PerspectiveCamera, movement: Vector3, selectedCell: Vector3) {
         this.container = container;
@@ -61,6 +62,7 @@ class Mouse {
     MouseMove(e: any) {
         this.clientX = e.clientX;
         this.clientY = e.clientY;
+        this.isMouseOver = true;
         this.CalculatedSelectedCell(e);
 
         let mag = 100;
@@ -97,6 +99,8 @@ class Mouse {
     }
 
     MouseLeave(e: any) {
+        this.isMouseOver = false;
+
         this.movement.x = 0;
         this.movement.y = 0;
         this.movement.z = 0;

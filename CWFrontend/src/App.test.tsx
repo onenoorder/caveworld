@@ -2,8 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// The real World boots a WebGL renderer, which jsdom cannot provide —
+// the app shell test only verifies rendering of the game chrome.
+jest.mock('./World');
+
+test('renders the game toolbar', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByAltText('Dig')).toBeInTheDocument();
 });

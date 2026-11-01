@@ -2,7 +2,7 @@ import { Vector3 } from 'three';
 import { IDwarf } from '_entities/dwarfs/index';
 import { Goal } from '_goals/index';
 import { Scaffold } from '_entities/index';
-import { EntityService } from '_services/index';
+import { ScaffoldService } from '_services/index';
 import { IAddScaffold } from '_utilities/IAddScaffold';
 
 export class ConstructScaffoldGoal extends Goal {
@@ -33,7 +33,7 @@ export class ConstructScaffoldGoal extends Goal {
         this.currentScaffoldNumber++;
 
         if (this.currentScaffoldNumber === 1) {
-          EntityService.Instance.AddScaffold(this.scaffold);
+          ScaffoldService.Instance.AddScaffold(this.scaffold);
           this.addScaffold.AddScaffold(this.scaffold);
         } else {
           this.scaffold.Build(1);
