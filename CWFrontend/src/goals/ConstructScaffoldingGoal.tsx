@@ -36,6 +36,7 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
     // every floor gets exactly one stair scaffold in the rightmost column
     // (x = width - 1), including the top floor.
     let leftCorner = this.building.GetLeftCorner();
+    let rightCorner = this.building.GetRightCorner();
     let ladderX = this.building.width - 1;
 
     // 1. Walk from wherever the dwarf stands to the left corner of the building.
@@ -91,7 +92,11 @@ export class ConstructScaffoldingGoal extends CompositeGoal {
       }
     }
 
-    steps.push(new FollowPathGoal(this.dwarf, this.CreateLeg(currentPosition, this.building.GetRightCorner().clone())));
+    // 4. Walk from the last scaffold cell to the right corner of the building.
+    for (let y = this.building.height - 1; y >= 0; y--) {
+      let cell = rightCorner.clone().add(new Vector3(0, y, 0));
+      steps.push(new FollowPathGoal(this.dwarf, this.CreateLeg(currentPosition, cell)));
+    }
 
     // Push the steps in reverse so that the first step (walking to the left
     // corner of the build) executes first on the LIFO sub goal stack.

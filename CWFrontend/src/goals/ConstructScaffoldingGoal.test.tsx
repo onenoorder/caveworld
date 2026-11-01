@@ -132,7 +132,7 @@ describe('ConstructScaffoldingGoal', () => {
     return { constructGoals, legGoals };
   }
 
-  it('starts at the bottom left and finishes at the top left of the build', () => {
+  it('places scaffolds from the bottom left through the top left of the build', () => {
     // Arrange
     placedScaffolds = [];
     let dwarf = CreateDwarf(new Vector3(20, 5, 0));
@@ -180,11 +180,14 @@ describe('ConstructScaffoldingGoal', () => {
     expect(constructGoals[0].target.x).toBe(10);
     expect(constructGoals[0].target.y).toBe(10);
 
-    // The final walk takes the dwarf to the building's right corner.
-    let finalLeg = legGoals[legGoals.length - 1];
-    let finalLegTarget = finalLeg.path[finalLeg.path.length - 1].position;
-    expect(finalLegTarget.x).toBe(13);
-    expect(finalLegTarget.y).toBe(10);
+    // The final walks descend the rightmost column to the building's bottom
+    // right corner.
+    let finalLegTargets = legGoals.slice(-3).map(leg => leg.path[leg.path.length - 1].position);
+    expect(finalLegTargets.map(target => [target.x, target.y])).toEqual([
+      [13, 12],
+      [13, 11],
+      [13, 10],
+    ]);
   });
 
   it('places stair scaffolds on the ground and intermediate floors, but not the top floor', () => {
