@@ -16,6 +16,8 @@ export enum BuildingIds {
   ToolFactory,
   CharcoalBurner,
   Laboratory,
-  FoodFactory,
-  CrystalLoadingstation
+    FoodFactory,
+  CrystalLoadingstation,
+  Bamboo,
+  Tree
 }

@@ -5,6 +5,8 @@ import { Stair } from '_entities/Stair';
 import { MainHouse, TinyHouse } from '_houses/index';
 import { RedDwarf } from '_dwarfs/index';
 import { SmallStorageHouse } from '_buildings/storages/index';
+import { Bamboo, Tree } from '_buildings/index';
+import { PlantingJob } from '_jobs/index';
 
 function makeIEntityDouble(x: number, y: number): IEntity {
   return {
@@ -443,13 +445,132 @@ describe('EntityService (CAV-002)', () => {
       const dwarfTick = jest.spyOn(dwarf, 'Tick').mockImplementation(() => new Vector3());
       jest.spyOn(construction, 'IsCompleted').mockReturnValue(true);
 
-      // Act
+            // Act
       service.Tick(0.016);
 
       // Assert
       expect(constructionTick).toHaveBeenCalledWith(0.016);
       expect(service.constructions).not.toContain(construction);
       expect(dwarfTick).toHaveBeenCalledWith(0.016);
+    });
+  });
+
+  describe('CAV-004: plant registration, seeding and regression seams (M1, M5, M6)', () => {
+    it('M1: AddBuilding(plant) registers a PlantingJob and never creates a construction (no scaffold, no standing work)', () => {
+      // Arrange
+      const plant = new Bamboo(new Vector3(10, 10, 0));
+      const addJob = jest.spyOn(service, 'AddJob');
+
+      // Act
+      service.AddBuilding(plant);
+
+      // Assert — a PlantingJob was registered for the plant...
+      expect(addJob).toHaveBeenCalledTimes(1);
+      const job = addJob.mock.calls[0][0];
+      expect(job).toBeInstanceOf(PlantingJob);
+      expect(JobService.Instance.jobs).toContain(job);
+      // ...and the construction chain was bypassed entirely.
+      expect(service.constructions).toHaveLength(0);
+    });
+
+    it('M1: IsPlant duck-types on the planted marker (and non-plants stay non-plants)', () => {
+      // Arrange
+      const plant = new Tree(new Vector3(4, 4, 0));
+      const house = new MainHouse(new Vector3(10, 10, 0));
+
+      // Act + Assert
+      expect(service.IsPlant(plant)).toBe(true);
+      expect(service.IsPlant(house)).toBe(false);
+    });
+
+    it('M6: AddBuilding(non-plant building) still routes through ConstructionFactory exactly as before (regression seam)', () => {
+      // Arrange
+      service.TryAddBuilding(new MainHouse(new Vector3(10, 10, 0)));
+
+      // Act
+      service.AddBuilding(new TinyHouse(new Vector3(20, 20, 0)));
+
+      // Assert — pre-CAV-004 behavior: every building after the first gets
+      // its BuildingConstruction job.
+      expect(service.constructions).toHaveLength(1);
+      expect(JobService.Instance.jobs.some(j => !(j instanceof PlantingJob))).toBe(true);
+    });
+
+    it('M5: EnqueueSeed defers registration to after the buildings iteration in Tick — no mid-iteration mutation', () => {
+      // Arrange — one building whose Tick observes the registry mid-iteration.
+      const observer = new MainHouse(new Vector3(10, 10, 0));
+      const sizesSeen: number[] = [];
+      const parent = new Bamboo(new Vector3(30, 10, 0));
+      const cell = new Vector3(31, 10, 0);
+      service.buildings.push(observer);
+      jest.spyOn(observer, 'Tick').mockImplementation(() => {
+        sizesSeen.push(service.buildings.length);
+      });
+      (MapService as any).Instance.CanPlace = jest.fn(() => true);
+
+      // Act — enqueue while "inside" the iteration (before Tick's flush).
+      service.EnqueueSeed(parent, cell);
+      expect(service.buildings).toHaveLength(1);
+      service.Tick(0.016);
+
+      // Assert — the observer ran before the seed landed; the flush
+      // registered the OFFSPRING (not the parent) exactly once, with map
+      // build + scene add, and no second job was created for it.
+      expect(sizesSeen).toEqual([1]);
+      expect(service.buildings).toHaveLength(2);
+      const offspring = service.buildings[1];
+      expect(offspring).not.toBe(parent);
+      expect(offspring).toBeInstanceOf(Bamboo);
+      expect((offspring as Bamboo).planted).toBe(true);
+      expect(service.scene.add).toHaveBeenCalledWith(offspring.object);
+      expect((MapService as any).Instance.Build).toHaveBeenCalledWith(cell, 2, 1);
+      expect(JobService.Instance.jobs.filter(j => j instanceof PlantingJob)).toHaveLength(0);
+    });
+
+    it('M5: RegisterSeed re-validates CanPlace and rejects (returning false) when the cell went invalid', () => {
+      // Arrange
+      const parent = new Tree(new Vector3(30, 10, 0));
+      const cell = new Vector3(31, 10, 0);
+      (MapService as any).Instance.CanPlace = jest.fn(() => false);
+
+      // Act
+      const registered = service.RegisterSeed(parent, cell);
+
+      // Assert — nothing was created, added or built.
+      expect(registered).toBe(false);
+      expect(service.buildings).toHaveLength(0);
+      expect(service.scene.add).not.toHaveBeenCalled();
+      expect((MapService as any).Instance.Build).not.toHaveBeenCalled();
+    });
+
+    it('M5: RegisterSeed registers a planted offspring at the cell with map build + scene add (happy path)', () => {
+      // Arrange
+      const parent = new Tree(new Vector3(30, 10, 0));
+      const cell = new Vector3(31, 10, 0);
+      (MapService as any).Instance.CanPlace = jest.fn(() => true);
+
+      // Act
+      const registered = service.RegisterSeed(parent, cell);
+
+      // Assert
+      expect(registered).toBe(true);
+      expect(service.buildings).toHaveLength(1);
+      const offspring = service.buildings[0];
+      expect(offspring).toBeInstanceOf(Tree);
+      expect(offspring).not.toBe(parent);
+      expect(offspring.position.x).toBe(31);
+      expect((offspring as Tree).planted).toBe(true);
+      expect(service.scene.add).toHaveBeenCalledWith(offspring.object);
+      expect((MapService as any).Instance.Build).toHaveBeenCalledWith(cell, 3, 1);
+    });
+
+    it('GetSeedCells returns the flank and corner cells along the bottom row around the footprint', () => {
+      // Arrange — a building 3 wide at (10,5): candidates at x 9..13, y 5.
+      // Act
+      const cells = service.GetSeedCells(new Vector3(10, 5, 0), 2, 3);
+
+      // Assert
+      expect(cells.map(c => `${c.x},${c.y}`)).toEqual(['9,5', '10,5', '11,5', '12,5', '13,5']);
     });
   });
 });

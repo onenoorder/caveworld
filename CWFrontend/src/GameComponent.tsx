@@ -50,7 +50,10 @@ class GameComponent extends Component {
         <img style={{width:"60px", height:"40px", float:"left", objectFit:"scale-down"}} alt="FoodFactory" src={"textures/buildings/FoodFactory.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.FoodFactory)} />
         <img style={{width:"60px", height:"40px", float:"left", objectFit:"scale-down"}} alt="CharcoalBurner" src={"textures/buildings/CharcoalBurner.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.CharcoalBurner)} />
         <img style={{width:"60px", height:"40px", float:"left", objectFit:"scale-down"}} alt="Laboratory" src={"textures/buildings/Laboratory.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.Laboratory)} />
-        <img style={{width:"60px", height:"40px", float:"left", objectFit:"scale-down"}} alt="CrystalLoadingstation" src={"textures/buildings/CrystalLoadingstation.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.CrystalLoadingstation)} />
+                <img style={{width:"60px", height:"40px", float:"left", objectFit:"scale-down"}} alt="CrystalLoadingstation" src={"textures/buildings/CrystalLoadingstation.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.CrystalLoadingstation)} />
+
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="Plant Bamboo" title="Plant Bamboo" src={"textures/buildings/Bamboo.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.Bamboo)} />
+        <img style={{width:"40px", height:"40px", float:"left", objectFit:"scale-down"}} alt="Plant Tree" title="Plant Tree" src={"textures/buildings/Tree.png"} onClick={() => PlacementService.Instance.PlaceBuilding(BuildingIds.Tree)} />
       </div>
     </>);
   }

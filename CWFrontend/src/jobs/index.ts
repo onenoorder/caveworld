@@ -4,3 +4,4 @@ export { CraftJob } from './CraftJob';
 export { DigJob } from './DigJob';
 export { CraftStairJob } from './CraftStairJob';
 export { BuildingConstructionJob } from './BuildingConstructionJob';
+export { PlantingJob } from './PlantingJob';

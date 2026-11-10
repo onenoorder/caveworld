@@ -16,3 +16,4 @@ export * from './ConstructScaffoldGoal';
 export * from './ConstructBuildingGoal';
 export * from './DeconstructScaffoldingGoal';
 export * from './DeconstructScaffoldGoal';
+export * from './PlantingGoal';

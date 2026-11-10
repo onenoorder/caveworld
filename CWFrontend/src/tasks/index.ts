@@ -5,3 +5,4 @@ export * from './DeconstructScaffoldTask';
 export * from './ConstructScaffoldTask';
 export * from './ConstructBuildingTask';
 export * from './CraftStairTask';
+export * from './PlantingTask';

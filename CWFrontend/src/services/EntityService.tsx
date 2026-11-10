@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import { JobService, MapService, ScaffoldService } from '_services/index';
 import { IHouse } from '_houses/index';
 import { IDwarf } from '_dwarfs/index';
-import { IBuilding } from '_buildings/index';
+import { IBuilding, IPlant } from '_buildings/index';
 import { IConstruction } from '_constructions/index';
 import { IJob } from '_jobs/index';
+import { PlantingJob } from '_jobs/index';
 import { ConstructionFactory } from '_factories/ConstructionFactory';
 import { IEntity, Scaffold, Stair } from '_entities/index';
 
@@ -15,6 +16,7 @@ class EntityService {
   stairs: Stair[];
   houses: IHouse[];
   dwarfs: IDwarf[];
+  seedQueue: { plant: IPlant, cell: THREE.Vector3 }[];
 
   public static Instance: EntityService;
 
@@ -25,6 +27,7 @@ class EntityService {
     this.stairs = [];
     this.houses = [];
     this.dwarfs = [];
+    this.seedQueue = [];
   }
 
   public static Setup(scene: THREE.Scene) {
@@ -44,7 +47,7 @@ class EntityService {
     return canPlace;
   }
 
-  AddBuilding(building: IBuilding) {
+    AddBuilding(building: IBuilding) {
     if (this.IsHouse(building)) {
       this.houses.push(building as IHouse);
     }
@@ -53,10 +56,52 @@ class EntityService {
     this.scene.add(building.BuildObject());
     MapService.Instance.Build(building.position, building.height, building.width);
 
-    if (this.buildings.length > 1) {
+    if (this.IsPlant(building)) {
+      // CAV-004: plants never enter the construction-job chain — a dwarf
+      // plants them via a walk-only PlantingJob (architecture D3).
+      this.AddJob(new PlantingJob(building as IPlant));
+    } else if (this.buildings.length > 1) {
       let construction = ConstructionFactory.Build(building);
       this.AddConstruction(construction);
     }
+  }
+
+  IsPlant(building: IBuilding): boolean {
+    return 'planted' in building;
+  }
+
+  // CAV-004 (D6): plants enqueue seeded offspring instead of mutating
+  // buildings[] mid-iteration; Tick flushes the queue after the iteration.
+  EnqueueSeed(plant: IPlant, cell: THREE.Vector3) {
+    this.seedQueue.push({ plant, cell });
+  }
+
+  // Registers a seeded plant: CanPlace re-validation + registration + map
+  // build + scene add — the same steps as AddBuilding minus the house,
+  // construction and job logic (seeds skip the planting dwarf by design).
+  // The parent plant creates the offspring via Seed(cell); the offspring —
+  // not the parent — is the entity that gets registered.
+  RegisterSeed(plant: IPlant, cell: THREE.Vector3): boolean {
+    if (!MapService.Instance.CanPlace(cell, plant.height, plant.width))
+      return false;
+
+    const offspring = plant.Seed(cell);
+    this.buildings.push(offspring);
+    this.scene.add(offspring.BuildObject());
+    MapService.Instance.Build(cell, plant.height, plant.width);
+    return true;
+  }
+
+  // All candidate cells whose footprint could host a same-type seed next to
+  // the given footprint (architecture D6): the free corner cells plus the
+  // flanks one column beyond each side edge, at the bottom row.
+  GetSeedCells(position: THREE.Vector3, height: number, width: number): THREE.Vector3[] {
+    let cells: THREE.Vector3[] = [];
+
+    for (let x = position.x - 1; x <= position.x + width; x++)
+      cells.push(new THREE.Vector3(x, position.y, 0));
+
+    return cells;
   }
 
   AddConstruction(construction: IConstruction) {
@@ -160,10 +205,20 @@ class EntityService {
     });
   }
 
-  Tick(delta: number) {
+    Tick(delta: number) {
     this.buildings.forEach((building) => {
       building.Tick(delta);
     });
+
+    // CAV-004 (D6): flush seeds only after the buildings iteration — no
+    // mid-iteration mutation of buildings[] (deterministic, test M5).
+    if (this.seedQueue.length > 0) {
+      const pending = this.seedQueue;
+      this.seedQueue = [];
+      pending.forEach((seed) => {
+        this.RegisterSeed(seed.plant, seed.cell);
+      });
+    }
 
     this.constructions.forEach((construction) => {
       construction.Tick(delta);

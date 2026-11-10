@@ -1,5 +1,10 @@
 export type { IBuilding } from './IBuilding';
+export type { IPlant } from './IPlant';
 export { Building } from './Building';
+export { Plant, GROWTH_FRAME_SECONDS, SEED_ROLL_SECONDS } from './Plant';
+export type { SeedCellSource } from './Plant';
+export { Bamboo } from './Bamboo';
+export { Tree } from './Tree';
 export * from './houses';
 export * from './storages';
 export * from './factories';

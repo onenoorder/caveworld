@@ -1,6 +1,6 @@
 import { Vector3 } from 'three';
 import { TinyHouse, SmallHouse, MediumHouse, HugeHouse, BigHouse } from '_houses/index';
-import { IBuilding } from '_buildings/index';
+import { IBuilding, Bamboo, Tree } from '_buildings/index';
 import { MediumStorageHouse, SmallStorageHouse, BigStorageHouse } from '_storages/index';
 import { Woodworks, Stoneworks, Steelworks, Waterworks, ToolFactory, CogwheelFactory, FoodFactory, CharcoalBurner, Laboratory, CrystalLoadingstation } from '_buildings/factories/index';
 import { BuildingIds } from '_utilities/Enums';
@@ -64,8 +64,15 @@ class BuildingFactory {
       case BuildingIds.Laboratory:
         building = new Laboratory(position);
       break;
-      case BuildingIds.CrystalLoadingstation:
+            case BuildingIds.CrystalLoadingstation:
         building = new CrystalLoadingstation(position);
+      break;
+
+      case BuildingIds.Bamboo:
+        building = new Bamboo(position);
+      break;
+      case BuildingIds.Tree:
+        building = new Tree(position);
       break;
     }
 

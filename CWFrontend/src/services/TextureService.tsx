@@ -64,8 +64,8 @@ class TextureService {
     return this.GetTexture(this.buildingsMap + name);
   }
 
-  GetBuildingTextureWithState(name: string, state: number): Texture {
-    if (state === 4) {
+    GetBuildingTextureWithState(name: string, state: number, stateCount: number = 4): Texture {
+    if (state === stateCount) {
       return this.GetBuildingTexture(name);
     } else {
       return this.GetBuildingTexture(name + state.toString());
