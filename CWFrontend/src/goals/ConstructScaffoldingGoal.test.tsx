@@ -1,7 +1,7 @@
 import { Texture, Vector3 } from 'three';
 import { ConstructScaffoldingGoal, FollowPathGoal } from '_goals/index';
 import { ConstructScaffoldGoal } from '_goals/ConstructScaffoldGoal';
-import { MapService, EntityService, TextureService } from '_services/index';
+import { MapService, EntityService, TextureService, ScaffoldService } from '_services/index';
 import { IAddScaffold } from '_utilities/IAddScaffold';
 import { GraphNode } from '_utilities/index';
 import { Scaffold } from '_entities/Scaffold';
@@ -27,11 +27,18 @@ describe('ConstructScaffoldingGoal', () => {
       },
     } as unknown as EntityService;
 
-    // Scaffold.Build refreshes its texture on every build step; textures are
+        // Scaffold.Build refreshes its texture on every build step; textures are
     // loaded by the renderer, so a plain Three.js texture is handed out instead.
     TextureService.Instance = {
       GetScaffoldTexture: (_number: number) => new Texture(),
     } as unknown as TextureService;
+
+    // ConstructScaffoldGoal registers the first scaffold directly with
+    // ScaffoldService (scene-level add); the unit test records nothing —
+    // the double just accepts it (EntityService.test uses the same Setup
+    // pattern). Pre-existing master gap: the ScaffoldService call was added
+    // to the goal without its double here, breaking this suite on master.
+    ScaffoldService.Setup({ add: jest.fn(), remove: jest.fn() } as any);
   });
 
   let placedScaffolds: Scaffold[];
@@ -86,8 +93,11 @@ describe('ConstructScaffoldingGoal', () => {
     } as unknown as IBuilding;
   }
 
-  function CreateAddScaffold(): IAddScaffold {
-    return { AddScaffold: (_scaffold: Scaffold) => undefined };
+    function CreateAddScaffold(): IAddScaffold {
+    // The goal registers each placed scaffold through the injected
+    // IAddScaffold (and ScaffoldService for the scene); the test records
+    // every registration here to assert the full count at the end.
+    return { AddScaffold: (scaffold: Scaffold) => { placedScaffolds.push(scaffold); } };
   }
 
   /**

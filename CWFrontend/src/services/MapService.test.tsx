@@ -1,6 +1,5 @@
 import { Vector3 } from 'three';
 import { MapService } from '_services/index';
-import { Cave, Map } from '_entities/index';
 import { TextureService } from '_services/index';
 
 // CAV-004 M2/M3/M4 (test design 0f67245b): map footprint semantics for the
@@ -9,27 +8,46 @@ import { TextureService } from '_services/index';
 // paths untouched — architecture D7). Real MapService instance with scene /
 // renderer / Cave doubles (boundary mocking per the test strategy).
 
-function makeCellGraphDouble() {
-  return { AddPosition: jest.fn() };
+// Cave's constructor drives the renderer and queries TextureService; the
+// strategy allow-lists Cave, so it is doubled at the module boundary. The
+// real Map entity is inert under Jest (pure Three.js objects) and stays
+// real. The factory is hoisted by Jest above every import and must be
+// fully self-contained (no out-of-scope references). Cave is doubled with
+// a PLAIN constructor, not jest.fn: CRA's Jest config sets resetMocks:
+// true, which would strip a jest.fn implementation before the first test
+// and turn `new Cave(...)` into an empty mock instance.
+jest.mock('_entities/index', () => ({
+  ...jest.requireActual('_entities/index'),
+  Cave: function CaveDouble() {
+    return {
+      BuildObject: () => ({}),
+      Destroy: () => undefined,
+      Rebuild: () => undefined,
+      UpdateTextureOnPosition: () => undefined,
+      Tick: () => undefined,
+    };
+  },
+}));
+
+// Cave's constructor reads TextureService.Instance.GetExcavationTexture, so
+// the double must exist before the first MapService.Setup call.
+const fakeTexture = { dispose: jest.fn() } as any;
+
+function setupTextureDouble() {
+  (TextureService as any).Instance = {
+    Destroy: jest.fn(),
+    GetTexture: jest.fn(() => fakeTexture),
+    GetBuildingTexture: jest.fn(() => fakeTexture),
+    GetBuildingTextureWithState: jest.fn(() => fakeTexture),
+    GetExcavationTexture: jest.fn(() => fakeTexture),
+  };
 }
 
 function setupMap(width = 40, height = 30) {
   const scene = { add: jest.fn(), remove: jest.fn() } as any;
   const renderer = {} as any;
   (MapService as any).Instance = undefined;
-  // Cave's constructor drives the renderer; the strategy allow-lists Cave,
-  // so double it at the module boundary.
-  const caveDouble = { BuildObject: () => ({}), Destroy: jest.fn(), Rebuild: jest.fn(), UpdateTextureOnPosition: jest.fn(), Tick: jest.fn() };
-  const caveCtor = Cave;
-  const mapDouble = { BuildObject: () => ({}), Destroy: jest.fn() };
-  const mapCtor = Map;
-  jest.mock('_entities/index', () => ({
-    ...jest.requireActual('_entities/index'),
-    Cave: jest.fn(() => caveDouble),
-    Map: jest.fn(() => mapDouble),
-  }));
   MapService.Setup(scene, renderer, height, width);
-  void caveCtor; void mapCtor;
   return MapService.Instance;
 }
 
@@ -40,14 +58,7 @@ function dig(map: MapService, x: number, y: number) {
 
 describe('MapService plant placement semantics (CAV-004 M2/M3/M4)', () => {
   beforeEach(() => {
-    const fakeTexture = { dispose: jest.fn() } as any;
-    (TextureService as any).Instance = {
-      Destroy: jest.fn(),
-      GetTexture: jest.fn(() => fakeTexture),
-      GetBuildingTexture: jest.fn(() => fakeTexture),
-      GetBuildingTextureWithState: jest.fn(() => fakeTexture),
-    };
-    void makeCellGraphDouble;
+    setupTextureDouble();
   });
 
   afterEach(() => {
@@ -111,18 +122,23 @@ describe('MapService plant placement semantics (CAV-004 M2/M3/M4)', () => {
   });
 
   it('M3: out-of-bounds rejects on every edge', () => {
-    // Arrange
+    // Arrange — map 40 wide x 30 tall with everything dug EXCEPT the top
+    // row (y=29): the ceiling rule (workable row above rejects) would
+    // otherwise mask the pure bounds checks for any 2-tall footprint.
     const map = setupMap(40, 30);
     for (let x = 0; x < 40; x++)
-      for (let y = 0; y < 30; y++)
+      for (let y = 0; y < 29; y++)
         dig(map, x, y);
 
     // Act + Assert
     expect(map.CanPlace(new Vector3(-1, 0, 0), 2, 1)).toBe(false); // x < 0
     expect(map.CanPlace(new Vector3(0, -1, 0), 2, 1)).toBe(false); // y < 0
-    expect(map.CanPlace(new Vector3(40, 0, 0), 2, 1)).toBe(false); // x + w > width
-    expect(map.CanPlace(new Vector3(0, 29, 0), 2, 1)).toBe(false); // y + h > height
-    expect(map.CanPlace(new Vector3(0, 28, 0), 2, 1)).toBe(true);  // edge-fit ok
+    expect(map.CanPlace(new Vector3(40, 0, 0), 1, 1)).toBe(false); // x + w > width
+    expect(map.CanPlace(new Vector3(0, 29, 0), 1, 1)).toBe(false); // y + h > height
+    expect(map.CanPlace(new Vector3(39, 0, 0), 1, 1)).toBe(true);  // right-edge fit
+    // Bottom edge-fit: spans y 0..1 with no row above (y = -1 is undefined,
+    // not workable) — the ceiling rule is undefined-safe at y = 0.
+    expect(map.CanPlace(new Vector3(0, 0, 0), 2, 1)).toBe(true);
   });
 
   it('M2: planting clears buildable only — workable stays true (cells remain passable) and paths untouched', () => {
@@ -134,6 +150,9 @@ describe('MapService plant placement semantics (CAV-004 M2/M3/M4)', () => {
         dig(map, x, y);
 
     // Act — plant a Bamboo at (10,5): footprint cells (10,5) and (10,6).
+    // The spy is cleared after the Arrange digs: Free/AddPosition calls from
+    // setting up the test map are not the behavior under test.
+    addPosition.mockClear();
     map.Build(new Vector3(10, 5, 0), 2, 1);
 
     // Assert — buildable consumed...

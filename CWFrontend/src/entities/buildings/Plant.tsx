@@ -97,19 +97,21 @@ abstract class Plant extends Building implements IPlant {
   }
 
   private TrySeed(): void {
-    if (this.elapsedSincePlanted < this.nextSeedAt)
-      return;
+    // Catch-up loop: exactly one roll per elapsed 60 s cadence slot, so a
+    // single large delta (e.g. a throttled/backgrounded frame loop) neither
+    // starves seeding nor bursts beyond the cadence (test S5).
+    while (this.elapsedSincePlanted >= this.nextSeedAt) {
+      this.nextSeedAt += SEED_ROLL_SECONDS;
 
-    this.nextSeedAt += SEED_ROLL_SECONDS;
+      const cell = this.seedCellSource();
+      if (cell === null)
+        continue;
 
-    const cell = this.seedCellSource();
-    if (cell === null)
-      return;
+      if (!MapService.Instance.CanPlace(cell, this.height, this.width))
+        continue;
 
-    if (!MapService.Instance.CanPlace(cell, this.height, this.width))
-      return;
-
-    EntityService.Instance.EnqueueSeed(this, cell);
+      EntityService.Instance.EnqueueSeed(this, cell);
+    }
   }
 
   // Builds the plant's mesh hidden until a dwarf plants it (D8). Seeded

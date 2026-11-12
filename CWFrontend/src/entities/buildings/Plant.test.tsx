@@ -1,7 +1,11 @@
 import { Vector3 } from 'three';
+// Import order matters: entering the buildings -> services -> factories ->
+// houses require cycle from the services side first is the established
+// convention (EntityService.test / BuildingFactory.test) — importing the
+// buildings barrel first leaves House extending an unfinished re-export.
+import { EntityService, MapService, TextureService } from '_services/index';
 import { Bamboo, Tree } from '_buildings/index';
 import { GROWTH_FRAME_SECONDS, SEED_ROLL_SECONDS } from '_buildings/index';
-import { EntityService, MapService, TextureService } from '_services/index';
 
 // CAV-004 G1–G5, S1–S6 (test design 0f67245b): plant lifecycle, growth
 // timing, and seeding — deterministic via injected delta (architecture D4)
