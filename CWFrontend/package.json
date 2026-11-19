@@ -22,7 +22,7 @@
   "scripts": {
     "start": "react-app-rewired --openssl-legacy-provider start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test --passWithNoTests",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
     "eslintConfig": {
