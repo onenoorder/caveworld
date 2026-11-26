@@ -54,8 +54,8 @@ console.log('old-atlas top row now at 288 (x0..96 ink):', rowInk(288, 0, 96), 'p
 console.log('old-atlas bottom row now at 1736 (x0..96 ink):', rowInk(1736, 0, 96), 'px');
 
 // growth textures spot check
-function fileStats(rel) {
-  const p = PNG.sync.read(fs.readFileSync(path.join(root, 'CWFrontend/public/textures/buildings', rel)));
+function fileStats(rel, subdir = 'buildings') {
+  const p = PNG.sync.read(fs.readFileSync(path.join(root, 'CWFrontend/public/textures', subdir, rel)));
   let n = 0, firstX = -1, lastX = -1;
   for (let x = 0; x < p.width; x++) {
     let ink = false;
@@ -64,7 +64,9 @@ function fileStats(rel) {
   }
   return `${rel}: ${p.width}x${p.height}, ink columns ${n} (${firstX}..${lastX})`;
 }
-console.log(fileStats('Bamboo0.png'));
-console.log(fileStats('Bamboo.png'));
-console.log(fileStats('Tree0.png'));
-console.log(fileStats('Tree.png'));
+console.log(fileStats('Bamboo0.png', 'plants/bamboo'));
+console.log(fileStats('Bamboo35.png', 'plants/bamboo'));
+console.log(fileStats('Bamboo.png', 'plants/bamboo'));
+console.log(fileStats('Tree0.png', 'plants/tree'));
+console.log(fileStats('Tree14.png', 'plants/tree'));
+console.log(fileStats('Tree.png', 'plants/tree'));

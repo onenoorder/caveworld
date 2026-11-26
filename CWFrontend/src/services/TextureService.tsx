@@ -6,6 +6,8 @@ class TextureService {
   loaded: Map<string, boolean>;
   texturesMap: string = 'textures/';
   buildingsMap: string = 'buildings/';
+  bambooMap: string = 'plants/bamboo/';
+  treeMap: string = 'plants/tree/';
   excavationMaskTexturePrefix: string = 'excavation/ExcavationMask';
   scaffoldTexturePrefix: string = 'construction/Scaffold';
   dwarfsMap: string = 'dwarf/';
@@ -61,10 +63,15 @@ class TextureService {
   }
 
   GetBuildingTexture(name: string): Texture {
-    return this.GetTexture(this.buildingsMap + name);
+    const map = name === 'Bamboo' || name.startsWith('Bamboo')
+      ? this.bambooMap
+      : name === 'Tree' || name.startsWith('Tree')
+        ? this.treeMap
+        : this.buildingsMap;
+    return this.GetTexture(map + name);
   }
 
-    GetBuildingTextureWithState(name: string, state: number, stateCount: number = 4): Texture {
+  GetBuildingTextureWithState(name: string, state: number, stateCount: number = 4): Texture {
     if (state === stateCount) {
       return this.GetBuildingTexture(name);
     } else {

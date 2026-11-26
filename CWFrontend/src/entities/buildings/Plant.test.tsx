@@ -89,11 +89,11 @@ describe('Plant lifecycle and growth timing (CAV-004 G1–G5)', () => {
     plant.BuildObject();
     plant.Plant();
 
-    // Act — far beyond (N-1)*60 = 2280s for the measured Bamboo N=39.
-    plant.Tick((39 - 1) * 60 + 100000);
+    // Act — far beyond (N-1)*60 = 2160s for the measured Bamboo N=37.
+    plant.Tick((37 - 1) * 60 + 100000);
 
     // Assert
-    expect(plant.frame).toBe(38);
+    expect(plant.frame).toBe(36);
   });
 
   it('G4: dirty check — two Ticks inside the same frame request the growth texture at most once', () => {
@@ -111,7 +111,7 @@ describe('Plant lifecycle and growth timing (CAV-004 G1–G5)', () => {
 
     // Assert — only the frame-0 swap (from Plant-time material creation is
     // separate; growth swaps only fire on frame change).
-    const growthSwaps = calls.filter(c => c.name === 'Bamboo' && c.state === 0 && c.stateCount === 38);
+    const growthSwaps = calls.filter(c => c.name === 'Bamboo' && c.state === 0 && c.stateCount === 36);
     expect(growthSwaps.length).toBeLessThanOrEqual(1);
     expect(plant.frame).toBe(0);
   });
@@ -157,11 +157,11 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     plant.BuildObject();
     plant.Plant();
 
-    // Act — N=39 for Bamboo: window at (39-1)*30 = 1140s. Stay below it.
-    plant.Tick(1139);
+    // Act — N=37 for Bamboo: window at (37-1)*30 = 1080s. Stay below it.
+    plant.Tick(1079);
 
     // Assert
-    expect(plant.frame).toBe(18);
+    expect(plant.frame).toBe(17);
     expect(source).not.toHaveBeenCalled();
     expect(canPlace).not.toHaveBeenCalled();
     expect(enqueueSeed).not.toHaveBeenCalled();
@@ -174,8 +174,8 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     plant.BuildObject();
     plant.Plant();
 
-    // Act — reach exactly the window (1140s for Bamboo): first roll fires.
-    plant.Tick(1140);
+    // Act — reach exactly the window (1080s for Bamboo): first roll fires.
+    plant.Tick(1080);
     // 59s later: no second roll yet.
     plant.Tick(59);
     expect(source).toHaveBeenCalledTimes(1);
@@ -197,7 +197,7 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     canPlace.mockReturnValue(false);
 
     // Act — one roll at the window.
-    plant.Tick(1140);
+    plant.Tick(1080);
     expect(canPlace).toHaveBeenCalledWith(cell, 2, 1);
     expect(enqueueSeed).not.toHaveBeenCalled();
 
@@ -220,7 +220,7 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     canPlace.mockReturnValue(true);
 
     // Act
-    plant.Tick(1140);
+    plant.Tick(1080);
 
     // Assert
     expect(enqueueSeed).toHaveBeenCalledTimes(1);
@@ -234,10 +234,10 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     plant.BuildObject();
     plant.Plant();
 
-    // Act — past maturity (2280s) plus a full extra cadence.
-    plant.Tick(2280 + 61);
+    // Act — past maturity (2160s) plus a full extra cadence.
+    plant.Tick(2160 + 61);
 
-    // Assert — rolls at 1140 (window), 1200, 1260, ..., ≥ 2300: several.
+    // Assert — rolls at 1080 (window), 1140, 1200, ..., ≥ 2200: several.
     expect(source.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -250,7 +250,7 @@ describe('Plant seeding (CAV-004 S1–S6)', () => {
     plant.Plant();
 
     // Act — one roll inside the window.
-    plant.Tick(1140);
+    plant.Tick(1080);
 
     // Assert — the default source consulted GetSeedCells and CanPlace got
     // one of the candidates (Math.random picked among them).
@@ -310,7 +310,7 @@ describe('Plant mesh contract (CAV-004 D8)', () => {
     expect(object.visible).toBe(true);
   });
 
-  it('Tree carries its measured type data (1 wide x 3 tall, 18 frames)', () => {
+  it('Tree carries its measured type data (1 wide x 3 tall, 16 states)', () => {
     // Arrange + Act
     const tree = new Tree(new Vector3(1, 1, 0));
 
@@ -318,7 +318,7 @@ describe('Plant mesh contract (CAV-004 D8)', () => {
     expect(tree.name).toBe('Tree');
     expect(tree.width).toBe(1);
     expect(tree.height).toBe(3);
-    expect(tree.frameCount).toBe(18);
+    expect(tree.frameCount).toBe(16);
     expect(tree).toBeInstanceOf(Tree);
     const offspring = tree.Seed(new Vector3(2, 1, 0));
     expect(offspring).toBeInstanceOf(Tree);

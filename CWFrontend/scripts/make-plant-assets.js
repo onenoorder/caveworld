@@ -1,11 +1,16 @@
 // CAV-004: growth-frame crop + cursor-pair composer (one-off asset generation).
 //
-// Measured facts (scripts/analyze-sheets.js, verify gate):
-//   Bamboo Nursery.png 1871x96  -> N = 39 frames of 48 px (frame 38 mature)
-//   Tree   Nursery.png 851x144  -> N = 18 frames of 48 px (frame 17 mature)
+// Tree growth textures come from the individual sheets/Tree0.png..Tree14.png
+// images; Tree.png remains the mature texture already in the output folder.
+// The nursery sheet is still used for the placement cursor silhouette.
+//   Bamboo growth assets are sourced individually from sheets/Bamboo0.png
+//   through sheets/Bamboo35.png; Bamboo.png remains the mature texture.
 // Contract (render doc 87407bec v3 C/D/E):
-//   export Bamboo0..37.png + Bamboo.png, Tree0..16.png + Tree.png at
-//   48x96 / 48x144 into public/textures/buildings/ (pitch grid exactly 48).
+//   copy sheets/Bamboo0.png..Bamboo35.png and keep Bamboo.png at 48x96 in
+//   public/textures/plants/bamboo/
+//   and sheets/Tree0.png..Tree14.png at 48x144 into
+//   public/textures/plants/tree/, preserving Tree.png.
+//   (pitch grid exactly 48).
 //
 // Cursor atlas layout (REGENERATED v2 — top append, not bottom append):
 // Placement.tsx offset.y counts pixels from the atlas BOTTOM (flipY
@@ -25,6 +30,8 @@ const { PNG } = require('pngjs');
 
 const root = path.resolve(__dirname, '..', '..');
 const BUILDINGS_DIR = path.join(root, 'CWFrontend/public/textures/buildings');
+const BAMBOO_DIR = path.join(root, 'CWFrontend/public/textures/plants/bamboo');
+const TREE_DIR = path.join(root, 'CWFrontend/public/textures/plants/tree');
 const ATLAS = path.join(root, 'CWFrontend/public/textures/PlacementCursors.png');
 
 const BAMBOO = { sheet: 'Bamboo Nursery.png', frames: 39, frameH: 96 };
@@ -70,19 +77,32 @@ function tint(png, rgb) {
   return out;
 }
 
-function exportFrames(name, spec) {
-  const sheet = load(path.join(root, 'sheets', spec.sheet));
-  const last = spec.frames - 1;
-  for (let k = 0; k <= last; k++) {
-    const frame = cropFrame(sheet, k, spec.frameH);
-    const file = k === last ? `${name}.png` : `${name}${k}.png`;
-    save(path.join(BUILDINGS_DIR, file), frame);
+function exportBambooFrames() {
+  fs.mkdirSync(BAMBOO_DIR, { recursive: true });
+  for (let k = 0; k <= 35; k++) {
+    const source = path.join(root, 'sheets', `Bamboo${k}.png`);
+    const destination = path.join(BAMBOO_DIR, `Bamboo${k}.png`);
+    fs.copyFileSync(source, destination);
   }
-  console.log(`${name}: exported ${spec.frames} files (${last} growth frames + mature ${name}.png)`);
+  console.log('Bamboo: copied sheets/Bamboo0.png .. sheets/Bamboo35.png; kept mature Bamboo.png');
 }
 
-exportFrames('Bamboo', BAMBOO);
-exportFrames('Tree', TREE);
+function copyTreeFrames() {
+  fs.mkdirSync(TREE_DIR, { recursive: true });
+  for (let frame = 0; frame <= 14; frame++) {
+    const source = path.join(root, 'sheets', `Tree${frame}.png`);
+    const destination = path.join(TREE_DIR, `Tree${frame}.png`);
+    fs.copyFileSync(source, destination);
+  }
+  for (const staleFrame of ['Tree15.png', 'Tree16.png']) {
+    const destination = path.join(TREE_DIR, staleFrame);
+    if (fs.existsSync(destination)) fs.unlinkSync(destination);
+  }
+  console.log('Tree: copied sheets/Tree0.png .. Tree14.png; kept mature Tree.png');
+}
+
+exportBambooFrames();
+copyTreeFrames();
 
 // ---- cursor atlas extension (top append) --------------------------------
 // Same silhouette for both states (existing convention: only fill color
