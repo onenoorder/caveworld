@@ -11,7 +11,7 @@ class Placement implements IEntity, IWithTextureService {
   width: number;
   buildingId: BuildingIds;
   jobId: number;
-  textureHeight: number = 1737;
+  textureHeight: number = 1449;
   textureWidth: number = 1163;
   textureUnitSize: number = 48;
   canPlace: boolean;
@@ -237,7 +237,7 @@ class Placement implements IEntity, IWithTextureService {
           this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 23) + 6);
         }
       break;
-            case BuildingIds.CrystalLoadingstation:
+      case BuildingIds.CrystalLoadingstation:
         this.height = 3;
         this.width = 4;
         if (this.canPlace) {
@@ -252,24 +252,24 @@ class Placement implements IEntity, IWithTextureService {
       // of the PlacementCursors atlas; offset.y counts px from the bottom).
       case BuildingIds.Bamboo:
         this.height = 2;
-        this.width = 1;
+        this.width = 3;
         if (this.canPlace) {
-          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 1) + 1);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 30) + 9);
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 21) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 6);
         } else {
-          this.texture.offset.x = 1 / this.textureWidth * (this.textureUnitSize * 0);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 30) + 9);
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 18) + 4);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 6);
         }
       break;
       case BuildingIds.Tree:
         this.height = 3;
-        this.width = 1;
+        this.width = 3;
         if (this.canPlace) {
-          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 1) + 1);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 33) + 9);
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 21) + 3);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 20) + 6);
         } else {
-          this.texture.offset.x = 1 / this.textureWidth * (this.textureUnitSize * 0);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 33) + 9);
+          this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 18) + 4);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 20) + 6);
         }
       break;
     }
