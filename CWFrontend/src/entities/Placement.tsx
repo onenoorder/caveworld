@@ -255,10 +255,10 @@ class Placement implements IEntity, IWithTextureService {
         this.width = 3;
         if (this.canPlace) {
           this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 21) + 3);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 6);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 7);
         } else {
           this.texture.offset.x = 1 / this.textureWidth * ((this.textureUnitSize * 18) + 4);
-          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 6);
+          this.texture.offset.y = 1 / this.textureHeight * ((this.textureUnitSize * 16) + 7);
         }
       break;
       case BuildingIds.Tree:
