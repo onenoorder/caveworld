@@ -27,6 +27,13 @@ module.exports = {
     'src/World.tsx',
     'src/services/EntityService.tsx',
     'src/controls/Mouse.tsx',
+    // Gated files (CAV-003, tier 1 — pure data structures, no WebGL):
+    // the ratchet widens from 3 files toward all of src/, starting with the
+    // utilities named by the story's task decomposition.
+    'src/utilities/Stack/Stack.tsx',
+    'src/utilities/Queue/Queue.tsx',
+    'src/utilities/Graph/Graph.tsx',
+    'src/utilities/Graph/GraphNode.tsx',
     // Test-strategy allow-list: excluded from the gate entirely.
     '!src/services/TextureService.tsx',
     '!src/entities/Cave.tsx',

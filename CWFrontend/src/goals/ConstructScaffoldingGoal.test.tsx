@@ -1,7 +1,7 @@
 import { Texture, Vector3 } from 'three';
 import { ConstructScaffoldingGoal, FollowPathGoal } from '_goals/index';
 import { ConstructScaffoldGoal } from '_goals/ConstructScaffoldGoal';
-import { MapService, EntityService, TextureService, ScaffoldService } from '_services/index';
+import { MapService, TextureService, ScaffoldService } from '_services/index';
 import { IAddScaffold } from '_utilities/IAddScaffold';
 import { GraphNode } from '_utilities/index';
 import { Scaffold } from '_entities/Scaffold';
@@ -19,13 +19,16 @@ describe('ConstructScaffoldingGoal', () => {
       },
     } as unknown as MapService;
 
-    // ConstructScaffoldGoal hands built scaffolds to EntityService; the unit
-    // test records them instead of touching the Three.js scene.
-    EntityService.Instance = {
+            // ConstructScaffoldGoal.Run registers the first built scaffold of every
+    // construct step through ScaffoldService (the scene add was moved out of
+    // the goal into the service); the unit test swaps the service for a
+    // recording double instead of touching the Three.js scene.
+    ScaffoldService.Instance = {
       AddScaffold: (scaffold: Scaffold) => {
         placedScaffolds.push(scaffold);
       },
-    } as unknown as EntityService;
+      RemoveScaffold: jest.fn(),
+    } as unknown as ScaffoldService;
 
         // Scaffold.Build refreshes its texture on every build step; textures are
     // loaded by the renderer, so a plain Three.js texture is handed out instead.
@@ -236,7 +239,7 @@ describe('ConstructScaffoldingGoal', () => {
     expect(topFloorStairs.length).toBe(0);
   });
 
-  it('completes and registers every scaffold with EntityService when run tick by tick', () => {
+  it('completes and registers every scaffold with ScaffoldService when run tick by tick', () => {
     // Arrange
     placedScaffolds = [];
     let dwarf = CreateDwarf(new Vector3(20, 5, 0));
