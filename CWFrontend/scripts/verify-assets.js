@@ -65,7 +65,7 @@ function fileStats(rel, subdir = 'buildings') {
   return `${rel}: ${p.width}x${p.height}, ink columns ${n} (${firstX}..${lastX})`;
 }
 console.log(fileStats('Bamboo0.png', 'plants/bamboo'));
-console.log(fileStats('Bamboo35.png', 'plants/bamboo'));
+console.log(fileStats('Bamboo31.png', 'plants/bamboo'));
 console.log(fileStats('Bamboo.png', 'plants/bamboo'));
 console.log(fileStats('Tree0.png', 'plants/tree'));
 console.log(fileStats('Tree14.png', 'plants/tree'));

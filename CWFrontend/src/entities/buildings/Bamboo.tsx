@@ -2,12 +2,11 @@ import * as THREE from 'three';
 import { Plant, SeedCellSource } from '_buildings/index';
 import { IPlant } from '_buildings/index';
 
-// CAV-004: Bamboo — mature footprint 1 wide x 2 tall; sheets/Bamboo0.png
-// through sheets/Bamboo35.png provide the growth frames, followed by the
-// mature Bamboo.png.
+// CAV-004: Bamboo — mature footprint 1 wide x 2 tall; Bamboo0.png through
+// Bamboo31.png provide the growth frames, and Bamboo.png is mature frame 32.
 class Bamboo extends Plant {
   constructor(position: THREE.Vector3, seedCellSource?: SeedCellSource) {
-    super('Bamboo', position, 2, 1, 37, seedCellSource);
+    super('Bamboo', position, 2, 1, 33, seedCellSource);
   }
 
   Seed(cell: THREE.Vector3): IPlant {

@@ -9,7 +9,7 @@ import { TinyHouse } from '_houses/index';
 // to TinyHouse in BuildingFactory.Build (risk R1) and the measured plant
 // texture counts (risk R5; measured by the crop contract render 87407bec block D).
 describe('BuildingFactory plant mapping (CAV-004 F1)', () => {
-  it('builds a Bamboo (1 wide x 2 tall, 37 measured states) for BuildingIds.Bamboo — never a TinyHouse', () => {
+  it('builds a Bamboo (1 wide x 2 tall, 33 measured states) for BuildingIds.Bamboo — never a TinyHouse', () => {
     // Arrange + Act
     const bamboo = BuildingFactory.Build(BuildingIds.Bamboo, new Vector3(5, 5, 0));
 
@@ -18,7 +18,7 @@ describe('BuildingFactory plant mapping (CAV-004 F1)', () => {
     expect(bamboo.name).toBe('Bamboo');
     expect(bamboo.width).toBe(1);
     expect(bamboo.height).toBe(2);
-    expect((bamboo as Bamboo).frameCount).toBe(37);
+    expect((bamboo as Bamboo).frameCount).toBe(33);
     expect(bamboo).not.toBeInstanceOf(TinyHouse);
   });
 

@@ -48,15 +48,15 @@ describe('GetBuildingTextureWithState naming (CAV-004 T1)', () => {
   });
 
   it('a plant stateCount maps growth frames to <Name><frame>.png and the mature frame to <Name>.png', () => {
-    // Arrange — Bamboo: N = 37 states, stateCount = 36;
+    // Arrange — Bamboo: N = 33 states, stateCount = 32;
     // Tree: 15 growth frames plus the mature image, stateCount = 15.
     const { svc, requested } = makeRecordedService();
 
     // Act
-    svc.GetBuildingTextureWithState('Bamboo', 0, 36);
-    svc.GetBuildingTextureWithState('Bamboo', 21, 36);
-    svc.GetBuildingTextureWithState('Bamboo', 35, 36);
-    svc.GetBuildingTextureWithState('Bamboo', 36, 36);
+    svc.GetBuildingTextureWithState('Bamboo', 0, 32);
+    svc.GetBuildingTextureWithState('Bamboo', 21, 32);
+    svc.GetBuildingTextureWithState('Bamboo', 31, 32);
+    svc.GetBuildingTextureWithState('Bamboo', 32, 32);
     svc.GetBuildingTextureWithState('Tree', 0, 15);
     svc.GetBuildingTextureWithState('Tree', 14, 15);
     svc.GetBuildingTextureWithState('Tree', 15, 15);
@@ -65,7 +65,7 @@ describe('GetBuildingTextureWithState naming (CAV-004 T1)', () => {
     expect(requested).toEqual([
       'plants/bamboo/Bamboo0',
       'plants/bamboo/Bamboo21',
-      'plants/bamboo/Bamboo35',
+      'plants/bamboo/Bamboo31',
       'plants/bamboo/Bamboo',
       'plants/tree/Tree0',
       'plants/tree/Tree14',

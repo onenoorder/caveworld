@@ -4,9 +4,9 @@
 // images; Tree.png remains the mature texture already in the output folder.
 // The nursery sheet is still used for the placement cursor silhouette.
 //   Bamboo growth assets are sourced individually from sheets/Bamboo0.png
-//   through sheets/Bamboo35.png; Bamboo.png remains the mature texture.
+//   through sheets/Bamboo31.png; Bamboo.png is mature frame 32.
 // Contract (render doc 87407bec v3 C/D/E):
-//   copy sheets/Bamboo0.png..Bamboo35.png and keep Bamboo.png at 48x96 in
+//   copy sheets/Bamboo0.png..Bamboo31.png and keep Bamboo.png as mature frame 32 at 48x96 in
 //   public/textures/plants/bamboo/
 //   and sheets/Tree0.png..Tree14.png at 48x144 into
 //   public/textures/plants/tree/, preserving Tree.png.
@@ -79,12 +79,12 @@ function tint(png, rgb) {
 
 function exportBambooFrames() {
   fs.mkdirSync(BAMBOO_DIR, { recursive: true });
-  for (let k = 0; k <= 35; k++) {
+  for (let k = 0; k <= 31; k++) {
     const source = path.join(root, 'sheets', `Bamboo${k}.png`);
     const destination = path.join(BAMBOO_DIR, `Bamboo${k}.png`);
     fs.copyFileSync(source, destination);
   }
-  console.log('Bamboo: copied sheets/Bamboo0.png .. sheets/Bamboo35.png; kept mature Bamboo.png');
+  console.log('Bamboo: copied sheets/Bamboo0.png .. sheets/Bamboo31.png; kept mature frame 32 in Bamboo.png');
 }
 
 function copyTreeFrames() {
