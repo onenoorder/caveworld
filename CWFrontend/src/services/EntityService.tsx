@@ -57,9 +57,8 @@ class EntityService {
     MapService.Instance.Build(building.position, building.height, building.width);
 
     if (this.IsPlant(building)) {
-      // CAV-004: plants never enter the construction-job chain — a dwarf
-      // plants them via a walk-only PlantingJob (architecture D3).
-      this.AddJob(new PlantingJob(building as IPlant));
+      const job = new PlantingJob(building as IPlant);
+      this.AddConstruction(ConstructionFactory.BuildFromJob(job));
     } else if (this.buildings.length > 1) {
       let construction = ConstructionFactory.Build(building);
       this.AddConstruction(construction);

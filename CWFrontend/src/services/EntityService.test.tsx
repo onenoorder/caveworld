@@ -456,21 +456,39 @@ describe('EntityService (CAV-002)', () => {
   });
 
   describe('CAV-004: plant registration, seeding and regression seams (M1, M5, M6)', () => {
-    it('M1: AddBuilding(plant) registers a PlantingJob and never creates a construction (no scaffold, no standing work)', () => {
+    it('AddBuilding(plant) registers a PlantingJob and displays its flag construction', () => {
       // Arrange
       const plant = new Bamboo(new Vector3(10, 10, 0));
-      const addJob = jest.spyOn(service, 'AddJob');
 
       // Act
       service.AddBuilding(plant);
 
-      // Assert — a PlantingJob was registered for the plant...
-      expect(addJob).toHaveBeenCalledTimes(1);
-      const job = addJob.mock.calls[0][0];
+      // Assert — a PlantingJob and its flag are registered.
+      const job = JobService.Instance.jobs[0];
       expect(job).toBeInstanceOf(PlantingJob);
       expect(JobService.Instance.jobs).toContain(job);
-      // ...and the construction chain was bypassed entirely.
-      expect(service.constructions).toHaveLength(0);
+      expect(service.constructions).toHaveLength(1);
+      expect(service.scene.add).toHaveBeenCalledWith(service.constructions[0].object);
+    });
+
+    it('keeps the plant flag until the planting task completes, then removes it', () => {
+      // Arrange
+      service.AddBuilding(new Bamboo(new Vector3(10, 10, 0)));
+      const construction = service.constructions[0];
+      const job = JobService.Instance.jobs[0] as PlantingJob;
+      const goal = job.Work({ position: new Vector3(0, 0, 0) } as any)!;
+
+      // Act — task handed to a dwarf is not yet a completed planting.
+      service.Tick(0.016);
+
+      // Assert
+      expect(service.constructions).toContain(construction);
+
+      // Complete the planting goal; the next entity tick removes its flag.
+      goal.completed = true;
+      service.Tick(0.016);
+      expect(service.constructions).not.toContain(construction);
+      expect(service.scene.remove).toHaveBeenCalledWith(construction.object);
     });
 
     it('M1: IsPlant duck-types on the planted marker (and non-plants stay non-plants)', () => {

@@ -36,14 +36,17 @@ describe('PlantingJob (CAV-004 J1)', () => {
     expect(job.tasks.Pop()).toBeInstanceOf(PlantingTask);
   });
 
-  it('reports not completed while its single task is still on the stack and completes once the task is handed out', () => {
+  it('stays active after its task is handed out and completes when planting finishes', () => {
     // Arrange
     const plant = new Bamboo(new Vector3(4, 2, 0));
     const job = new PlantingJob(plant);
 
-    // Act + Assert — IsCompleted is inherited: tasks.Size() === 0 (J4).
+    // Act + Assert — task handoff does not mean planting is complete.
     expect(job.IsCompleted()).toBe(false);
-    job.Work({ position: new Vector3(0, 0, 0) } as any);
+    const goal = job.Work({ position: new Vector3(0, 0, 0) } as any)!;
+    expect(job.IsCompleted()).toBe(false);
+
+    goal.completed = true;
     expect(job.IsCompleted()).toBe(true);
   });
 
