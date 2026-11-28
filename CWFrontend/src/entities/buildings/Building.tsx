@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { MeshBasicMaterial, Vector3 } from 'three';
 import { IBuilding } from '.';
 import { TextureService } from '_services/index';
+import { Inventory } from './inventory/Inventory';
+import { IInventory } from './inventory/IInventory';
+import { GetSlotCount } from './inventory/BuildingInventoryConfig';
 
 abstract class Building implements IBuilding {
   position: THREE.Vector3;
@@ -13,6 +16,7 @@ abstract class Building implements IBuilding {
   state: number = 0;
   buildProgress: number = 0;
   buildTotal: number;
+  inventory: IInventory;
 
   constructor(name: string, position: THREE.Vector3, height: number, width: number, door: number) {
     this.position = position;
@@ -22,6 +26,10 @@ abstract class Building implements IBuilding {
     this.door = door;
     this.buildTotal = height * width * 10;
     this.object = new THREE.Mesh();
+    // CAV-022 (architecture D2): one attach point covers both construction
+    // paths (BuildingFactory and the direct MainHouse spawn); plants and any
+    // unconfigured name resolve to an inert 0-slot inventory.
+    this.inventory = new Inventory(GetSlotCount(name));
   }
 
   BuildObject() {

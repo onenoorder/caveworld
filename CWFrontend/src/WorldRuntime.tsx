@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { TextureService, JobService, MapService, InteractiontService, EntityService, PlacementService, ScaffoldService } from '_services/index';
+import { TextureService, JobService, InventoryService, MapService, InteractiontService, EntityService, PlacementService, ScaffoldService } from '_services/index';
 import { MainHouse } from '_houses/index';
 
 // WebGL/texture bootstrap shell for the World simulation.
@@ -24,6 +24,7 @@ class WorldRuntime {
 
     TextureService.Setup();
     JobService.Setup();
+    InventoryService.Setup(); // CAV-022 (architecture D8): goods controller, stateless — order-tolerant, precedes all consumers.
     MapService.Setup(this.scene, this.renderer, 135, 240);
 
     InteractiontService.Setup(this.scene);

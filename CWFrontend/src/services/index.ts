@@ -1,5 +1,6 @@
 export { EntityService } from './EntityService';
 export { JobService } from './JobService';
+export { InventoryService } from './InventoryService';
 export { ScaffoldService } from './ScaffoldService';
 export * from './MapService';
 export * from './PlacementService';

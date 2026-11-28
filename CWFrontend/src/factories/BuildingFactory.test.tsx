@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 import { BuildingFactory } from '_factories/BuildingFactory';
 import { BuildingIds } from '_utilities/Enums';
-import { Bamboo, Tree } from '_buildings/index';
+import { Bamboo, Tree, GetSlotCount, BUILDING_SLOT_COUNTS } from '_buildings/index';
 import { TinyHouse } from '_houses/index';
 
 // CAV-004 F1/F2 (test design 0f67245b): factory mapping for the two plant
@@ -52,5 +52,55 @@ describe('BuildingIds plant exports (CAV-004 F2)', () => {
     expect(BuildingIds).toHaveProperty('Tree');
     expect(typeof BuildingIds.Bamboo).toBe('number');
     expect(typeof BuildingIds.Tree).toBe('number');
+  });
+});
+
+// CAV-022 FTY-01: the factory path attaches the configured inventory to every
+// factory-built construction type (the direct-construction path is covered by
+// Building.test BLD-02). Table-driven over the 18 factory-built catalogue ids.
+describe('BuildingFactory inventory initialization (CAV-022 FTY-01)', () => {
+  const position = new Vector3(5, 5, 0);
+
+  it('builds every construction type with its configured slot count (AC-1)', () => {
+    // Arrange — every catalogue id except MainHouse (factory-built set).
+    const constructionIds: BuildingIds[] = [
+      BuildingIds.TinyHouse, BuildingIds.SmallHouse, BuildingIds.MediumHouse,
+      BuildingIds.BigHouse, BuildingIds.HugeHouse,
+      BuildingIds.SmallStorageHouse, BuildingIds.MediumStorageHouse, BuildingIds.BigStorageHouse,
+      BuildingIds.Woodworks, BuildingIds.Stoneworks, BuildingIds.Steelworks,
+      BuildingIds.Waterworks, BuildingIds.ToolFactory, BuildingIds.CogwheelFactory,
+      BuildingIds.FoodFactory, BuildingIds.CharcoalBurner, BuildingIds.Laboratory,
+      BuildingIds.CrystalLoadingstation,
+    ];
+
+    // Act + Assert — each factory-built building initializes its inventory
+    // from the config keyed by its concrete name.
+    expect(constructionIds).toHaveLength(18);
+    for (const id of constructionIds) {
+      const building = BuildingFactory.Build(id, position);
+      expect(building.inventory.slotCount).toBe(GetSlotCount(building.name));
+      expect(building.inventory.slotCount).toBe((BUILDING_SLOT_COUNTS as any)[building.name]);
+      expect(building.inventory.slotCount).toBeGreaterThan(0);
+    }
+  });
+
+  it('plants built through the factory carry an inert 0-slot inventory (scope guard)', () => {
+    // Arrange + Act
+    const bamboo = BuildingFactory.Build(BuildingIds.Bamboo, position);
+    const tree = BuildingFactory.Build(BuildingIds.Tree, position);
+
+    // Assert — plants are not inventory holders, on the factory path too.
+    expect(bamboo.inventory.slotCount).toBe(0);
+    expect(tree.inventory.slotCount).toBe(0);
+    expect(bamboo.inventory.GetSlots()).toEqual([]);
+  });
+
+  it('the default fallthrough (an unknown id) still builds a TinyHouse with its configured inventory', () => {
+    // Arrange + Act — the known default: case fallthrough guards the switch.
+    const building = BuildingFactory.Build(-1 as BuildingIds, position);
+
+    // Assert
+    expect(building).toBeInstanceOf(TinyHouse);
+    expect(building.inventory.slotCount).toBe(2);
   });
 });

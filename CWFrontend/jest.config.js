@@ -34,6 +34,22 @@ module.exports = {
     'src/utilities/Queue/Queue.tsx',
     'src/utilities/Graph/Graph.tsx',
     'src/utilities/Graph/GraphNode.tsx',
+    // Gated files (CAV-022, inventory story): the domain module, the attach
+    // point, the service, the pure-type contract, and the barrels this story
+    // creates or touches (test design §6). Zero-countable-statement files
+    // (barrels, the ItemIds enum, IBuilding.tsx, IInventory.tsx) carry empty
+    // Istanbul counters: they join the pool, appear as 0% rows, and contribute
+    // 0/0 counters — they cannot fail the global thresholds. Their gate is
+    // compile-time (tsc strict) + the re-export/enum-member tests.
+    'src/utilities/Enums/ItemIds.tsx',
+    'src/entities/buildings/inventory/IInventory.tsx',
+    'src/entities/buildings/inventory/Inventory.tsx',
+    'src/entities/buildings/inventory/BuildingInventoryConfig.tsx',
+    'src/entities/buildings/Building.tsx',
+    'src/entities/buildings/IBuilding.tsx',
+    'src/entities/buildings/index.ts',
+    'src/services/InventoryService.tsx',
+    'src/services/index.ts',
     // Test-strategy allow-list: excluded from the gate entirely.
     '!src/services/TextureService.tsx',
     '!src/entities/Cave.tsx',
